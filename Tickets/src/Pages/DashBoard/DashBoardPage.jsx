@@ -3,8 +3,7 @@ import { SideBard } from '../../Components/UI/SideBard';
 import useModal from '../../Components/Hooks/useModal';
 import useProjects from '../../Components/Hooks/useProjects';
 import { CreateProyectModal } from './CreateProyectModal';
-import { overview, ticketsCompleted, ticketsInProgress, ticketsPending, highPriority, ticketsByProyect } from '../../services/ticketsService';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { overview, ticketsCompleted, ticketsInProgress, ticketsPending, highPriority } from '../../services/ticketsService';
 
 const DashBoardPage = () => {
   const { openModal, isModalOpen, closeModal } = useModal();
@@ -15,7 +14,6 @@ const DashBoardPage = () => {
   const [completedTickets, setCompletedTickets] = useState({});
   const [inProgressTickets, setInProgressTickets] = useState({});
   const [pendingTickets, setPendingTickets] = useState({});
-  const [projectTickets, setProjectTickets] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,14 +24,11 @@ const DashBoardPage = () => {
         const pendingData = await ticketsPending();
         const highPriorityData = await highPriority();
         
-        const projectData = await ticketsByProyect();
-        
         setTotalTickets(overviewData);
         setCompletedTickets(completedData);
         setInProgressTickets(inProgressData);
         setPendingTickets(pendingData);
         setHighTickets(highPriorityData);
-        setProjectTickets(projectData || []);
       }catch(err){
         console.error('Error fetching dashboard data:', err);
       }
@@ -121,27 +116,8 @@ const DashBoardPage = () => {
         </div>
         
         {/* Analitycs */}
-        <div className='w-full my-8 rounded-sm gap-16 grid grid-cols-2 grid-rows-2 justify-center items-center flex-1 overflow-auto'>
-          <div className='col-span-1 rounded-sm bg-cards w-full h-full'>
-            <div className='p-4 h-full flex flex-col'>
-              <h2 className='text-lg font-semibold mb-4'>Tickets por Proyecto</h2>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={projectTickets} layout="vertical" margin={{ left: 120 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="project_name" type="category" width={110} />
-                  <Tooltip />
-                  <Bar dataKey="total_tickets" fill="#256bdb" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          <div className='col-span-1 rounded-sm row-span-2 bg-cards w-full h-full'>
-            Tickets High Priority for Projects
-          </div>
-          <div className='col-span-1 rounded-sm bg-cards w-full h-full'>
-            Progress for Projects
-          </div>
+        <div className='w-full mt-4 rounded-lg bg-gray-100 flex justify-center items-center flex-1 overflow-auto mb-4'>
+
         </div>
         
         
@@ -151,3 +127,5 @@ const DashBoardPage = () => {
 }
 
 export default DashBoardPage;
+
+            
