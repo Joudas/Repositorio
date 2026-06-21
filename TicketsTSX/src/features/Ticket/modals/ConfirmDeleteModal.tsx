@@ -1,21 +1,15 @@
 import ModalShell from '@/Components/UI/ModalShell';
-import { useState } from 'react'
+import { useTicketList } from '../hooks/useTicketList';
+import type { TicketItem } from '../types';
 
-const ConfirmDeleteModal = ({closeModal, actualTicket, deleteTickets}) => {
-  const [loading, setLoading] = useState(false);
+const ConfirmDeleteModal = ({closeModal, actualTicket} : {closeModal: () => void; actualTicket: TicketItem}) => {
+  const {deleteTickets} = useTicketList(closeModal);
   
   const handleClose = () => {
     closeModal();
   }
   const handleSubmit = async () => {
-    if (actualTicket) {
-      setLoading(true);
-      const result = await deleteTickets(actualTicket.id);
-      setLoading(false);
-      if (result.ok) {
-        closeModal();
-      }
-    }
+      deleteTickets(actualTicket.id);
   }
   return (
     <ModalShell closeModal={handleClose} panelClassName='bg-white w-80 min-h-40 pt-10 pb-6 rounded-sm text-sidebard z-2'>

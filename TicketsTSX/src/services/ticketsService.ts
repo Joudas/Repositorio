@@ -35,10 +35,17 @@ export function getTicketProject(projectID) {
     method: 'GET',
   });
 }
+<<<<<<< Updated upstream
 export function changeStateTicket(state: string, ticketID: string) {
   return request(`/projects/tickets/${ticketID}/state`, {
     method: 'PATCH',
     body: JSON.stringify({ state }),
+=======
+export function changeStateTicket(state:string, ticketID:string){
+  return request(`/projects/tickets/${ticketID}/state`, {
+    method: 'PATCH',
+    body: JSON.stringify({state}),
+>>>>>>> Stashed changes
   });
 }
 export function updateTicket(payload, ticketID) {

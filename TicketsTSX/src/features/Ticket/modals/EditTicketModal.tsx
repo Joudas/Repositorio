@@ -1,27 +1,19 @@
-import { useContext, useEffect } from 'react'
-import TicketContext from '../context/TicketContext';
+import { useEffect } from 'react'
 import ModalShell from '@/Components/UI/ModalShell';
 import { Spiner } from '@/Components/Loadings/Spiner';
+import { useTicketList } from '../hooks/useTicketList';
+import type { TicketItem } from '../types';
 
-const EditTicketModal = ({closeModal, actualTicket}) => {
-    const {setForm, form, handleChange, editTicket, loadingForm} = useContext(TicketContext);
+const EditTicketModal = ({closeModal, actualTicket}: {closeModal: () => void; actualTicket: TicketItem}) => {
+    const {loadingSubmitEdit, editTicket, loadTicketUpdate, form, handleChange} = useTicketList(closeModal);
 
     useEffect(() => {
-        if (!actualTicket) return;
-        setForm({
-            name: actualTicket.name || '',
-            description: actualTicket.description || '',
-            state: actualTicket.state || 'pending',
-            priority: actualTicket.priority || 'low',
-        });
-    },[actualTicket, setForm])
+        loadTicketUpdate(actualTicket);
+    },[actualTicket])
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        const result = await editTicket(actualTicket.id);
-        if (result.ok) {
-            closeModal();
-        }
+        editTicket(actualTicket.id);
     }
     return (
         <ModalShell closeModal={closeModal} panelClassName='px-12 bg-white w-100 p-8 min-h-40 rounded-sm text-sidebard z-2'>
@@ -54,7 +46,7 @@ const EditTicketModal = ({closeModal, actualTicket}) => {
                         <option value='high' className='text-red-400'>Alta</option>
                     </select>
                 </div>
-                <button className='w-full h-10 btn-base rounded-sm relative' disabled={loadingForm}>{loadingForm ? 
+                <button className='w-full h-10 btn-base rounded-sm relative' disabled={loadingSubmitEdit}>{loadingSubmitEdit ? 
                 <Spiner/> : <div>Registrar</div> }
                 </button>
             </form>

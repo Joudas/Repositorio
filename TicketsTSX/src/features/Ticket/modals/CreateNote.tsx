@@ -4,9 +4,9 @@ import { useTickets } from '../context/TicketContext';
 
 const CreateNoteModal = ({closeModal} : {closeModal: () => void}) => {
 
-  const { projectID, ticketID } = useTickets();
+  const { ticketID } = useTickets();
 
-  const { formNotes, setFormNotes, submitNote, resetNotes } = useTicketNotes(projectID, ticketID, closeModal);
+  const { formNotes, setFormNotes, submitNote, resetNotes } = useTicketNotes(ticketID, closeModal);
   
   const handleChangeNote = (e: { target: { name: any; value: any; }; }) => {
       setFormNotes(prev => ({...prev, [e.target.name]: e.target.value}));

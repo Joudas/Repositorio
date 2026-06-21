@@ -1,3 +1,4 @@
+import type { TicketDetailProps } from '../types';
 import { TicketActions, TicketButton } from './TicketActions';
 
 

@@ -12,18 +12,34 @@ import EditTicketModal from '../modals/EditTicketModal';
 import Alerts from '@/Components/Alerts/Alerts';
 import useProject from '../hooks/useProject';
 import { useParams } from 'react-router';
+<<<<<<< Updated upstream
 import { useAlertStore } from '@/Store/alertStore';
 
+=======
+import { useAlertStore } from "@/Store/useAlertStore";
+>>>>>>> Stashed changes
 
 const TicketsScreen = () => {
     const { id: projectID } = useParams<{ id: string }>();
 
+<<<<<<< Updated upstream
     const { listTickets, defineTicket, isPendingTicket,
         ticketID, deleteTickets } = useTickets();
     const { isModalOpen, openModal, closeModal, activeModal,
         modalPayload } = useModalTickets();
     const { isOpen, message } = useAlertStore();
     const { project, isPending } = useProject({ projectID });
+=======
+    const {listTickets, defineTicket, isPendingTicket, 
+        ticketID, errorForm, deleteTickets } = useTickets();
+
+    const {isModalOpen, openModal, closeModal, activeModal, 
+        modalPayload} = useModalTickets();
+
+    const { isOpen, message } = useAlertStore();
+
+    const {project, isPending} = useProject({ projectID });
+>>>>>>> Stashed changes
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -78,6 +94,7 @@ const TicketsScreen = () => {
                 </div>
             </div>
 
+<<<<<<< Updated upstream
             {(isModalOpen && activeModal === 'ticket') && <CreateTicketModal projectID={projectID} closeModal={closeModal} />}
             {(isModalOpen && activeModal === 'note') && <CreateNoteModal closeModal={closeModal} />}
             {(isModalOpen && activeModal === 'delete') && <ConfirmDeleteModal closeModal={closeModal} actualTicket={modalPayload} deleteTickets={deleteTickets} />}
@@ -85,6 +102,15 @@ const TicketsScreen = () => {
             {isOpen && <Alerts message={message} />}
         </div>
     )
+=======
+        {(isModalOpen && activeModal === 'ticket') && <CreateTicketModal closeModal={closeModal}/>} 
+        {(isModalOpen && activeModal === 'note') && <CreateNoteModal closeModal={closeModal} />}
+        {(isModalOpen && activeModal === 'delete') && <ConfirmDeleteModal closeModal={closeModal} actualTicket={modalPayload} deleteTickets={deleteTickets} />}
+        {(isModalOpen && activeModal === 'edit') && <EditTicketModal closeModal={closeModal} actualTicket={modalPayload} />}
+        {isOpen && <Alerts message={message} />}
+    </div>
+  )
+>>>>>>> Stashed changes
 }
 
 export default TicketsScreen;

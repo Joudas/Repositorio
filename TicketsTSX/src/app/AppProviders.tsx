@@ -6,6 +6,7 @@ import { useQueryClient } from '@/Hooks/useQuery'
 import { LoginProvider } from '@/features/Login/context/LoginContext'
 import { RegisterProvider } from '@/features/Register/context/RegisterContext'
 
+<<<<<<< Updated upstream
 
 export default function AppProviders({ children }: { children: ReactNode }) {
     return (
@@ -21,4 +22,20 @@ export default function AppProviders({ children }: { children: ReactNode }) {
             </QueryClientProvider>
         </BrowserRouter>
     )
+=======
+export default function AppProviders({children}: {children: ReactNode}) {
+  return (
+    <BrowserRouter>
+        <QueryClientProvider client={useQueryClient()}>
+            <AuthProvider>
+                <RegisterProvider>
+                    <LoginProvider>
+                        {children}
+                    </LoginProvider>
+                </RegisterProvider>
+            </AuthProvider>
+        </QueryClientProvider>
+    </BrowserRouter> 
+  )
+>>>>>>> Stashed changes
 }

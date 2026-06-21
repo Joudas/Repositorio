@@ -22,12 +22,22 @@ export const TicketActions = ({ openModal, actualTicket }) => {
 }
 
 export const TicketButton = ({ actualTicket, stateTicket }) => {
+<<<<<<< Updated upstream
     const { changeState, loadingStateChange } = useTicketList();
     const handleChange = () => {
         if (!actualTicket) return;
         if (actualTicket.state === 'completed') return;
         console.log(stateTicket.next, actualTicket.id);
         changeState({ state: stateTicket.next, ticketID: String(actualTicket.id) });
+=======
+    
+    const { changeState, loadingStateChange } = useTicketList();
+    
+    const handleChange = () => {
+        if (!actualTicket) return;
+            if (actualTicket.state === 'completed') return;
+            changeState({ state: String(stateTicket.next), ticketID: String(actualTicket.id) });
+>>>>>>> Stashed changes
     }
     return (
         <div>
