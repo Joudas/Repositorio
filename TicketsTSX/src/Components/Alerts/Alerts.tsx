@@ -1,9 +1,9 @@
-import { useAlert } from '@/Hooks/useAlerts';
+import { useAlertStore } from '@/Store/alertStore';
 import { useEffect, useState } from 'react'
 
-export default function Alerts({message, duration = 3000}) {
+export default function Alerts({ message, duration = 3000 }: { message: string, duration?: number }) {
   const [progress, setProgress] = useState(100);
-  const {closeAlert} = useAlert();
+  const { closeAlert } = useAlertStore();
 
   useEffect(() => {
 

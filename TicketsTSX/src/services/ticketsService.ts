@@ -7,7 +7,7 @@ export function createProject(payload) {
   });
 }
 export function getProject(id) {
-  return request('/projects/'+id, {
+  return request('/projects/' + id, {
     method: 'GET',
   });
 }
@@ -35,25 +35,25 @@ export function getTicketProject(projectID) {
     method: 'GET',
   });
 }
-export function changeStateTicket(state, ticketID){
+export function changeStateTicket(state: string, ticketID: string) {
   return request(`/projects/tickets/${ticketID}/state`, {
     method: 'PATCH',
-    body: JSON.stringify(state),
+    body: JSON.stringify({ state }),
   });
 }
-export function updateTicket(payload, ticketID){
+export function updateTicket(payload, ticketID) {
   return request(`/projects/tickets/${ticketID}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
   });
 }
-export function deleteTicket(ticketID){
+export function deleteTicket(ticketID) {
   return request(`/projects/tickets/${ticketID}`, {
     method: 'DELETE',
   });
 }
 //notas
-export function createNote(payload, projectID, ticketID){
+export function createNote(payload, projectID, ticketID) {
   return request(`/projects/${projectID}/tickets/${ticketID}/notes`, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -65,40 +65,40 @@ export function getNotes(projectID, ticketID) {
   });
 }
 
-export function overview(){
+export function overview() {
   // "total_tickets": 42,
   // "high_priority": 10
   return request(`/projects/stats/overview`, {
     method: 'GET',
   });
 }
-export function ticketsInProgress(){
+export function ticketsInProgress() {
   // "total_in_progress": 5,
   // "high_priority_in_progress": 2
   return request(`/projects/stats/in-progress`, {
     method: 'GET',
   });
 }
-export function ticketsCompleted(){
+export function ticketsCompleted() {
   // "total_completed": 18,
   // "high_priority_completed": 5
   return request(`/projects/stats/completed`, {
     method: 'GET',
   });
 }
-export function ticketsPending(){
+export function ticketsPending() {
   return request(`/projects/stats/pending`, {
     method: 'GET',
   });
 }
-export function highPriority(){
+export function highPriority() {
   // "high_priority_total": 10,
   // "high_priority_pending": 4
   return request(`/projects/stats/high-priority/pending`, {
     method: 'GET',
   });
 }
-export function ticketsByProyect(){
+export function ticketsByProyect() {
   //   "project_id": 1,
   //   "project_name": "Proyecto A",
   //   "total_tickets": 15
@@ -106,7 +106,7 @@ export function ticketsByProyect(){
     method: 'GET',
   });
 }
-export function ticketsHighByProyect(){
+export function ticketsHighByProyect() {
   //   "project_id": 1,
   //   "project_name": "Proyecto A",
   //   "tickets": [
@@ -123,7 +123,7 @@ export function ticketsHighByProyect(){
     method: 'GET',
   });
 }
-export function ticketsProgress(){
+export function ticketsProgress() {
   //   "project_id": 1,
   //   "project_name": "Proyecto A",
   //   "completed": 8,

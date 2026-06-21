@@ -1,19 +1,18 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import type { TicketsContextType } from "../types";
 import { useTicketList } from "../hooks/useTicketList";
 import { useTicketNotes } from "../hooks/useTicketNotes";
 import { useParams } from "react-router";
 
-const TicketContext = createContext<TicketsContextType| undefined>(undefined);
+const TicketContext = createContext<TicketsContextType | undefined>(undefined);
 
 export const TicketProvider = ({ children }: { children: ReactNode }) => {
-  const { id: projectID } = useParams<{ id: string }>(); 
+  const { id: projectID } = useParams<{ id: string }>();
   const [ticketID, setTicketID] = useState<string | null>(null);
 
-    
-  const { submitTicket, editTicket, deleteTickets, form, changeState, handleChange, resetForm,
+  const { submitTicket, editTicket, deleteTickets, changeState, loadingStateChange,
     listTickets, isPendingTicket, isErrorTicket, errorTicket } = useTicketList(projectID);
-  const {notes, isPending, isError, error} = useTicketNotes(projectID, ticketID);
+  const { notes, isPending, isError, error } = useTicketNotes(projectID, ticketID);
 
   const defineTicket = (id: string | null) => {
     setTicketID(id || null);
@@ -25,22 +24,20 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
     setTicketID,
 
     notes,
-    isPending, 
-    isError, 
+    isPending,
+    isError,
     error,
 
     listTickets,
     defineTicket,
-    isPendingTicket, 
-    isErrorTicket, 
+    isPendingTicket,
+    isErrorTicket,
     errorTicket,
-    handleChange, 
-    submitTicket, 
-    editTicket, 
-    deleteTickets, 
-    changeState, 
-    resetForm,
-    form, 
+    submitTicket,
+    editTicket,
+    deleteTickets,
+    changeState,
+    loadingStateChange,
   } as unknown as TicketsContextType;
 
   return <TicketContext.Provider value={data}>{children}</TicketContext.Provider>;

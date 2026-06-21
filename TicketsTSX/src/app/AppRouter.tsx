@@ -8,7 +8,7 @@ import DashBoardPage from '@/features/DashBoard';
 import TicketsScreen from '@/features/Ticket';
 import { TicketProvider } from '@/features/Ticket/context/TicketContext';
 
-const PublicRoute = ({ children } : { children: ReactNode }) => {
+const PublicRoute = ({ children }: { children: ReactNode }) => {
   const { auth } = useAuth();
 
   return auth?.token ? <Navigate to="/dashboard" replace /> : children;
@@ -20,11 +20,8 @@ const AppRouter = () => {
   return (
     <Routes>
       <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<DashBoardPage />}/>
-            <Route path="/tickets/:id" element={
-              <TicketProvider>
-                <TicketsScreen />
-              </TicketProvider>} />
+        <Route path="/dashboard" element={<DashBoardPage />} />
+        <Route path="/tickets/:id" element={<TicketProvider><TicketsScreen /></TicketProvider>} />
       </Route>
       <Route
         path="/"
