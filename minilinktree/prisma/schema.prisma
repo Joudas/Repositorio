@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Nuestra relación manual hacia tu lógica de negocio:
+  perfil        Perfil?   
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// === TABLAS DE TU MINI-LINKTREE (Tu lógica de negocio) ===
+
+model Perfil {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  
+  // 👇 ASÍ SE HACE LA RELACIÓN PROFESIONAL EN PRISMA
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  username    String   @unique
+  displayName String?
+  bio         String?
+  avatarUrl   String?
+  theme       String?  @default("light")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  links       Link[]
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  order     Int      @default(0) // ¡Truco Senior! Lo necesitarás para el Drag & Drop de tus botones
+  createdAt DateTime @default(now())
+  imageUrl  String? 
+
+  // Relación con Perfil (Muchos a 1)
+  perfilId  String   // Llave foránea real en Postgres
+  perfil    Perfil   @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  isActive  Boolean @default(true)
+}

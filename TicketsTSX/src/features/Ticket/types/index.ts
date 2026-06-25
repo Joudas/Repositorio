@@ -48,7 +48,6 @@ export type TicketsContextType = {
     submitNote: () => Promise<{ ok: boolean; data?: any; message?: string }>;
     resetNotes: () => void;
 
-<<<<<<< Updated upstream
     /* Ticket form/actions */
     loadingForm: boolean;
     loadingStateChange: boolean;
@@ -64,25 +63,6 @@ export type TicketsContextType = {
         ticketID: string;
     }, unknown>;
     setForm: React.Dispatch<React.SetStateAction<TicketForm>>;
-=======
-  /* Ticket form/actions */
-  loadingForm: boolean;
-  loadingStateChange: boolean;
-  loadingSubmit?: boolean;
-  errorForm: string | null;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-    submitTicket: (data: { payload: TicketForm; projectID?: string | null }) => void;
-  editTicket: (id: string) => Promise<{ ok: boolean; data?: any; message?: string }>;
-  deleteTickets: (id: string) => Promise<{ ok: boolean; data?: any; message?: string }>;
-  changeState: (state: string, id: string) => Promise<any>;
-  resetForm: () => void;
-  form: TicketForm; 
-  setForm: React.Dispatch<React.SetStateAction<TicketForm>>;
-  submitTicketAsync: UseMutateAsyncFunction<any, Error, {
-    payload: TicketForm;
-    projectID?: string | null;
-}, unknown>
->>>>>>> Stashed changes
 };
 
 

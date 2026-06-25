@@ -5,11 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-charcola-blue: #2F4858;
-  --color-baitic-blue: #33658A;
+  --color-charcola-blue: #2F4858; /*#main*/
+  --color-charcola-blue-light: #4A708A; /*#hover*/
+  --color-baitic-blue: #33658A; 
   --color-sky-reflection: #86BBD8;
   --color-honey-bronze: #F6AE2D;
   --color-blaze-orange: #F26419;
+  --color-basic-bg: #f0f5f8
 }
 
 @theme inline {
@@ -134,4 +136,47 @@
   html {
     @apply font-sans;
   }
+}
+
+.bg-charcola {
+  background-color: var(--color-charcola-blue);
+}.bg-charcola:hover{
+  background-color: var(--color-charcola-blue-light);
+}
+.bg-charcola-hover:hover{
+  background-color: var(--color-charcola-blue-light);
+}
+.border-charcola {
+  border-color: var(--color-charcola-blue);
+}.border-charcola:hover{
+  border-color: var(--color-charcola-blue-light);
+}.border-charcola-hover:hover{
+  border-color: var(--color-charcola-blue-light);
+}
+
+.text-charcola{
+  color: var(--color-charcola-blue);
+}
+.bg-charcola-hover:hover{
+  color: var(--color-charcola-blue-light);
+}
+
+
+.bg-baitic{
+  background-color: var(--color-baitic-blue);
+}
+
+.bg-charcola-hover:hover {
+  background-color: var(--color-charcola-blue);
+  color: white;
+  border-color: var(--color-charcola-blue);
+}
+
+.aside{
+  background-color: var(--color-basic-bg);
+  border-color: var(--color-basic-bg);
+}
+.links:hover{
+  background-color: #cce4e4;
+  color: rgb(56, 92, 92)
 }

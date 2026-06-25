@@ -1,18 +1,9 @@
-<<<<<<< Updated upstream
 import { useAlertStore } from '@/Store/alertStore';
 import { useEffect, useState } from 'react'
 
 export default function Alerts({ message, duration = 3000 }: { message: string, duration?: number }) {
   const [progress, setProgress] = useState(100);
   const { closeAlert } = useAlertStore();
-=======
-import { useAlertStore } from '@/Store/useAlertStore';
-import { useEffect, useState } from 'react'
-
-export default function Alerts({message, duration = 3000} : { message: string; duration?: number }) {
-  const [progress, setProgress] = useState(100);
-  const {closeAlert, isError} = useAlertStore();
->>>>>>> Stashed changes
 
   useEffect(() => {
 
