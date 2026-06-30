@@ -1,11 +1,15 @@
-import 'dotenv/config'
 import { PrismaClient } from './generated/prisma'
 import { PrismaNeon } from '@prisma/adapter-neon'
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined }
 
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('Variable de entorno faltante: DATABASE_URL. Revisa .env.example')
+}
+
 const adapter = new PrismaNeon({
-  connectionString: process.env.DATABASE_URL!,
+  connectionString,
   max: 3,
 })
 

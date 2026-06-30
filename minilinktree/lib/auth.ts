@@ -1,27 +1,40 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
-import { Pool } from "pg"; //Postgres  // pnpm i -D @types/pg
+import { Pool } from "pg";
 import { prisma } from "./prisma";
+
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Variable de entorno faltante: ${name}. Revisa .env.example`);
+  }
+  return value;
+}
+
+const DATABASE_URL = requireEnv("DATABASE_URL");
+const GITHUB_CLIENT_ID = requireEnv("GITHUB_CLIENT_ID");
+const GITHUB_CLIENT_SECRET = requireEnv("GITHUB_CLIENT_SECRET");
+const GOOGLE_CLIENT_ID = requireEnv("GOOGLE_CLIENT_ID");
+const GOOGLE_CLIENT_SECRET = requireEnv("GOOGLE_CLIENT_SECRET");
+
 export const auth = betterAuth({
-	//...
     plugins: [nextCookies()],
 	database: new Pool({
-    // connection options
-        connectionString: process.env.DATABASE_URL,
-        ssl: false, // Si es etorno local false, si es bd en la nube true
+        connectionString: DATABASE_URL,
+        ssl: false,
     }),
-    emailAndPassword: { // Proveedores de email
+    emailAndPassword: {
         enabled: true, 
-        requireEmailVerification: true
+        requireEmailVerification: true,
     }, 
-    socialProviders: { // Proveedores de sociales
+    socialProviders: {
         github: { 
-        clientId: process.env.GITHUB_CLIENT_ID as string, 
-        clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
+        clientId: GITHUB_CLIENT_ID, 
+        clientSecret: GITHUB_CLIENT_SECRET, 
         }, 
         google: { 
-        clientId: process.env.GOOGLE_CLIENT_ID as string, 
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+        clientId: GOOGLE_CLIENT_ID, 
+        clientSecret: GOOGLE_CLIENT_SECRET, 
         }, 
     },
     emailVerification: {

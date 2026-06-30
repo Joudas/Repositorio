@@ -30,7 +30,7 @@ export default function FormProfile({ profile, onProfileUpdate, handleProfile }:
   }
   
 
-  const handleUpdateProfile = async (prevState: any, formData: FormData) => {
+  const handleUpdateProfile = async (prevState: { error: string | null | undefined }, formData: FormData) => {
     const displayName = formData.get("displayName") as string;
     const username = formData.get("username") as string;
     const bio = formData.get("bio") as string;
@@ -87,7 +87,7 @@ export default function FormProfile({ profile, onProfileUpdate, handleProfile }:
     handleProfile(profile);
   }
 
-  const [state, formAction, isPending] = useActionState(handleUpdateProfile, { error: "" });
+  const [state, formAction, isPending] = useActionState(handleUpdateProfile, { error: null });
 
   return (
     <form 
@@ -103,17 +103,7 @@ export default function FormProfile({ profile, onProfileUpdate, handleProfile }:
           </p>
         </div>
 
-        {/* Zona del Avatar (Foto de Perfil) */}
         <div className="flex items-center gap-6 border-b border-gray-100 pb-6">
-          {/* <div className="w-20 h-25 bg-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 relative group overflow-hidden">
-            {avatarUrl ? (
-              <Image src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              <User size={28} />
-            )}
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-              <span className="text-white text-xs font-medium">Cambiar</span>
-            </div> */}
 
             <button
               type="button"
@@ -139,7 +129,6 @@ export default function FormProfile({ profile, onProfileUpdate, handleProfile }:
               className="hidden"
             />
 
-          {/* </div> */}
           <div>
             <h3 className="text-sm font-semibold text-gray-800">Imagen de Perfil</h3>
             <p className="text-xs text-gray-500 mt-1 max-w-[240px]">

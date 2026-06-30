@@ -1,9 +1,10 @@
 "use client"
 import { Plus } from 'lucide-react';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import FormLinks from './FormLinks';
+import { Link } from "@prisma/client";
 
-export default function LeftContent({ getLink }: { getLink: any }) {
+export default function LeftContent({ getLink }: { getLink: Link[] }) {
     const [isAdding, setIsAdding] = useState(false);
 
   return (

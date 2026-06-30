@@ -17,7 +17,7 @@ type Props = {
 
 export const InlineForm = ({ link, onCancel, handleLinkCreated, handleLinksUpdated }: Props) => {
 
-  const submitAction = async (prevState: any, formData: FormData) => {
+  const submitAction = async (prevState: { error: string | null | undefined }, formData: FormData) => {
     const title = formData.get("title") as string;
     const url = formData.get("url") as string;
     const imageFile = formData.get("image") as File | null;

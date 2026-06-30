@@ -1,4 +1,3 @@
-import { saveUserProfile } from "@/actions/saveProfile";
 import { authClient } from "@/lib/auth-client";
 
 export function useProviderSignIn() {

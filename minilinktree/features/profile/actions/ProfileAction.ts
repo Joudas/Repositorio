@@ -12,44 +12,46 @@ const linkSchema = z.object({
 });
 
 const findUserName = async (username: string) => {
-  try {
-    const data = await prisma.perfil.findUnique({ where: { username } });
-    return data;
-  } catch {
-    return null;
-  }
-};
+    try{
+        const data = await prisma.perfil.findUnique({
+            where: {username}
+        })
+        return data;
+    }catch(err){
+        return{success: false, data:null, error: err};
+    }
+}
 
 export const UpdateProfileAction = async (body: {avatarUrl?: string | null | undefined, username: string, displayName: string, bio?: string}) => {
-  try {
-    const profile = await validateProfile();
+    try{
+        const profile = await validateProfile();
 
-    if (!profile) {
-      return { success: false, error: "No se encontró el perfil para este usuario." };
+        if(!profile){
+            return { success: false, error: "No se encontró el perfil para este usuario." };
+        }
+
+        const data = linkSchema.parse(body);
+        const userName = await findUserName(data.username);
+
+        if(!(profile.username == data.username)){
+            if(userName) return { success: false, data: null, error: "Nombre de usuario y atomado." };
+        }
+
+        const updateData = {
+            avatarUrl: data.avatarUrl,
+            username: data.username,
+            displayName: data.displayName, 
+            bio: data.bio
+        }
+
+        const updateProfile = await prisma.perfil.update({
+            where: {id: profile.id},
+            data: updateData
+        });
+        revalidatePath("/profile");
+
+        return {success: true, data: updateProfile, error: null}
+    }catch(err){
+        return{success: false, data:null, error: err};
     }
-
-    const data = linkSchema.parse(body);
-
-    if (profile.username !== data.username) {
-      const existing = await findUserName(data.username);
-      if (existing) return { success: false, error: "Nombre de usuario ya tomado." };
-    }
-
-    const updateData = {
-      avatarUrl: data.avatarUrl,
-      username: data.username,
-      displayName: data.displayName,
-      bio: data.bio,
-    };
-
-    const updateProfile = await prisma.perfil.update({
-      where: { id: profile.id },
-      data: updateData,
-    });
-    revalidatePath("/profile");
-
-    return { success: true, data: updateProfile, error: null };
-  } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : "Error al actualizar el perfil" };
-  }
-};
+}

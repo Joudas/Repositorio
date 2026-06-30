@@ -1,8 +1,7 @@
-"use client"
-
 import { Perfil, Link } from "@prisma/client";
 import LinkMock from "./LinkMock";
 import { User } from "lucide-react";
+import Image from "next/image";
 
 type Props = {
   profile: Perfil | null | undefined;
@@ -19,7 +18,7 @@ export default function Mock({ profile, links }: Props) {
             {/* Previsualización dinámica del Perfil */}
             <div className="mt-8 flex flex-col items-center text-center gap-3 w-full">
             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 overflow-hidden border">
-                {profile?.avatarUrl ? <img src={profile.avatarUrl} alt="Preview" className="w-full h-full object-cover" /> : <User size={24} />}
+                {profile?.avatarUrl ? <Image src={profile.avatarUrl} alt="Preview" width={64} height={64} className="w-full h-full object-cover" /> : <User size={24} />}
             </div>
             <div>
                 <h4 className="font-bold text-gray-800 text-sm">

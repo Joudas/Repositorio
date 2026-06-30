@@ -2,6 +2,7 @@ import { getPublicProfile } from "@/features/profile/actions/PublicProfileAction
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import LinkMock from "@/components/LinkMock";
+import Image from "next/image";
 import { User } from "lucide-react";
 
 export async function generateMetadata({
@@ -42,7 +43,7 @@ export default async function PublicProfilePage({
 
         <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden border-2 border-gray-300">
           {avatarUrl ? (
-            <img src={avatarUrl} alt={displayName ?? ""} className="w-full h-full object-cover" />
+            <Image src={avatarUrl} alt={displayName ?? ""} width={80} height={80} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">
               <User size={28} />
