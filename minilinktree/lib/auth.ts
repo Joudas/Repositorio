@@ -23,8 +23,7 @@ export const auth = betterAuth({
         connectionString: DATABASE_URL,
         ssl: false,
     }),
-    baseURL: process.env.BETTER_AUTH_URL || (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : undefined),
-
+    baseURL: process.env.BETTER_AUTH_URL,
     secret: process.env.BETTER_AUTH_SECRET,
     emailAndPassword: {
         enabled: true, 
