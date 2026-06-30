@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     preloadEntriesOnStart: false,
   },
+  serverExternalPackages: ['sharp'],
 };
 
 export default nextConfig;
