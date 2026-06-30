@@ -1,7 +1,16 @@
 import 'dotenv/config'
 import { PrismaClient } from './generated/prisma'
 import { PrismaNeon } from '@prisma/adapter-neon'
+
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined }
+
 const adapter = new PrismaNeon({
   connectionString: process.env.DATABASE_URL!,
+  max: 3,
 })
-export const prisma = new PrismaClient({ adapter })
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export { prisma }

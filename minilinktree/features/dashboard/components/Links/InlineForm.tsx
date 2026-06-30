@@ -1,23 +1,43 @@
-import { ImageIcon, Loader2 } from "lucide-react";
+"use client"
+import { Loader2 } from "lucide-react";
 import { CreateLinkAction, UpdateLinkAction } from "@/features/dashboard/actions/LinkAction";
+import { UploadImageAction } from "@/features/dashboard/actions/ImageAction";
 import InputLink from "./InputLink";
 import { Link } from "@prisma/client";
 import { useActionState } from "react";
+import { compressImage } from "@/utils/compressImage";
+import { showToast } from "nextjs-toast-notify";
 
 type Props = {
   link?: Link,
   onCancel: () => void,
   handleLinkCreated: (newLink: Link) => void
-  handleLinksUpdated: (newLink: Link ) => void
-
+  handleLinksUpdated: (newLink: Link) => void
 }
+
 export const InlineForm = ({ link, onCancel, handleLinkCreated, handleLinksUpdated }: Props) => {
-  
+
   const submitAction = async (prevState: any, formData: FormData) => {
     const title = formData.get("title") as string;
     const url = formData.get("url") as string;
-    const body = { title, url };
-    
+    const imageFile = formData.get("image") as File | null;
+
+    let imageUrl: string | undefined = link?.imageUrl ?? undefined;
+
+    if (imageFile && imageFile.size > 0) {
+      const compressed = await compressImage(imageFile);
+      const uploadFormData = new FormData();
+      uploadFormData.append("image", compressed);
+      const uploadResult = await UploadImageAction(uploadFormData);
+      if (uploadResult.success) {
+        imageUrl = uploadResult.imageUrl;
+      } else {
+        return { error: uploadResult.error };
+      }
+    }
+
+    const body = { title, url, imageUrl };
+
     let response;
     if (link) {
       response = await UpdateLinkAction(body, link.id);
@@ -26,6 +46,17 @@ export const InlineForm = ({ link, onCancel, handleLinkCreated, handleLinksUpdat
     }
 
     if (response.success && response.data) {
+
+      showToast.success(
+        link ? "¡Enlace actualizado con éxito!" : "¡Enlace creado con éxito!",
+        {
+          duration: 4000,
+          position: "top-right",
+          transition: "bounceIn",
+          progress: true,
+        }
+      );
+
       if (!link) {
         handleLinkCreated(response.data);
       } else {
@@ -34,42 +65,47 @@ export const InlineForm = ({ link, onCancel, handleLinkCreated, handleLinksUpdat
       return { error: null };
     }
 
-    return { error: response.error || "Something went wrong" };
+    const errorMsg = typeof response.error === "string" ? response.error : "Algo salió mal";
+
+    showToast.error(errorMsg, {
+      duration: 4000,
+      position: "top-right",
+      transition: "bounceIn",
+      progress: true,
+    });
+
+    return { error: errorMsg };
   };
 
   const [state, formAction, isPending] = useActionState(submitAction, { error: null });
 
-  return(
-    <form 
+  return (
+    <form
       action={formAction}
-      className="bg-white border-2 border-charcola rounded-xl p-5 shadow-md transition-all">
-        <div className="flex gap-4">
-          <button className="min-w-[64px] h-16 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 border-charcola-hover text-charcola-hover transition-colors group">
-            <ImageIcon size={24} className="group-hover:scale-110 transition-transform" />
-          </button>
-          <div className="flex-1 flex flex-col gap-3">
-            <InputLink link={link} />
-          </div>
-        </div>
-        <div className="flex justify-end gap-3 mt-4">
-          <button 
+      className="bg-white border-2 border-charcola rounded-xl p-5 shadow-md transition-all"
+    >
+      <InputLink link={link} />
+
+      {state.error && (
+        <p className="text-red-500 text-sm mt-2">{typeof state.error === 'string' ? state.error : 'Error al guardar'}</p>
+      )}
+
+      <div className="flex justify-end gap-3 mt-4">
+        <button
           disabled={isPending}
-          onClick={onCancel} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            Close
-          </button>
-          <button 
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          Close
+        </button>
+        <button
           disabled={isPending}
           type="submit"
-          className="cursor-pointer px-4 py-2 text-sm font-medium bg-charcola text-white rounded-lg bg-charcola-hover transition-colors">
-            {isPending ? (
-              <>
-                <Loader2 size={16} className="animate-spin" /> {/* 🚀 Spinner animado de Lucide */}
-              </>
-            ) : (
-              link ? "Update" : "Save Again"
-            )}
-          </button>
-        </div>
+          className="cursor-pointer px-4 py-2 text-sm font-medium bg-charcola text-white rounded-lg hover:bg-[#0E6251] transition-colors disabled:opacity-50"
+        >
+          {isPending ? <Loader2 size={16} className="animate-spin" /> : link ? "Update" : "Save Again"}
+        </button>
+      </div>
     </form>
   )
 };

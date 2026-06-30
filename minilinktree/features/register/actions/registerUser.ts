@@ -26,7 +26,7 @@ export function registerUser() {
         }
         if(data?.user){
             await saveUserProfile(data.user.id, data.user.name, data.user.email);
-            router.push("/dashboard")
+            router.push("/login")
         }
 
     }
