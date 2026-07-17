@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:backend": "backend\\.venv\\Scripts\\python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:backend": "backend/.venv/bin/python -m uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000",
     "build": "vite build",
     "dev:all": "concurrently \"pnpm run dev\" \"pnpm run dev:backend\"",
     "lint": "eslint .",
@@ -15,6 +15,8 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/react-query": "^5.101.0",
+    "motion": "^12.42.2",
+    "radix-ui": "^1.6.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router": "^7.17.0",

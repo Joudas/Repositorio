@@ -4,11 +4,11 @@ import { useTickets } from '../context/TicketContext';
 
 const CreateNoteModal = ({closeModal} : {closeModal: () => void}) => {
 
-  const { ticketID } = useTickets();
+  const { projectID, ticketID } = useTickets();
 
-  const { formNotes, setFormNotes, submitNote, resetNotes } = useTicketNotes(ticketID, closeModal);
+  const { formNotes, setFormNotes, submitNote, resetNotes } = useTicketNotes(projectID, ticketID, closeModal);
   
-  const handleChangeNote = (e: { target: { name: any; value: any; }; }) => {
+  const handleChangeNote = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       setFormNotes(prev => ({...prev, [e.target.name]: e.target.value}));
   }
 

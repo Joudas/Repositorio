@@ -5,7 +5,7 @@ const ConfirmPasswordPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmMessage, setConfirmMessage] = useState('');
-  const { handleState, validatePassword, submitRegister, isPending, error, isError } = useRegister();
+  const { handleState, validatePassword, submitRegister, isPending } = useRegister();
 
   const onSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -17,7 +17,7 @@ const ConfirmPasswordPage = () => {
 
     if(!validatePassword(confirmPassword, setConfirmMessage)) return;
     setConfirmMessage('');
-    submitRegister(confirmPassword);
+    submitRegister();
 
   }
 
@@ -25,7 +25,7 @@ const ConfirmPasswordPage = () => {
     handleState(2);
   }
 
-  const handleConfirmPassword = (e: { target: { value: any; }; }) => {
+  const handleConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setConfirmPassword(value);
   };

@@ -39,7 +39,13 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
     changeState,
     loadingStateChange,
   } as unknown as TicketsContextType
-  ))
+  ), [
+    projectID, ticketID, setTicketID,
+    notes, isPending, isError, error,
+    listTickets, defineTicket,
+    isPendingTicket, isErrorTicket, errorTicket,
+    submitTicket, editTicket, deleteTickets, changeState, loadingStateChange,
+  ])
   return <TicketContext.Provider value={data}>{children}</TicketContext.Provider>;
 };
 
@@ -48,5 +54,3 @@ export const useTickets = (): TicketsContextType => {
   if (!ctx) throw new Error("useTickets must be used within TicketProvider");
   return ctx;
 };
-
-export default TicketContext;

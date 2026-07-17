@@ -3,7 +3,7 @@ import { useTicketList } from '../hooks/useTicketList';
 import type { TicketItem } from '../types';
 
 const ConfirmDeleteModal = ({closeModal, actualTicket} : {closeModal: () => void; actualTicket: TicketItem}) => {
-  const {deleteTickets} = useTicketList(closeModal);
+  const {deleteTickets} = useTicketList(undefined, closeModal);
   
   const handleClose = () => {
     closeModal();

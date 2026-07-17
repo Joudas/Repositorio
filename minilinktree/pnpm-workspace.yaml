@@ -2,8 +2,17 @@ allowBuilds:
   '@prisma/engines': false
   esbuild: false
   prisma: false
-  sharp: false
   unrs-resolver: false
 ignoredBuiltDependencies:
-  - sharp
   - unrs-resolver
+
+onlyBuiltDependencies:
+  - sharp
+
+supportedArchitectures:
+  os:
+    - linux
+    - darwin
+  cpu:
+    - x64
+    - arm64

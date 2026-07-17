@@ -5,11 +5,11 @@ import { useTicketList } from '../hooks/useTicketList';
 import type { TicketItem } from '../types';
 
 const EditTicketModal = ({closeModal, actualTicket}: {closeModal: () => void; actualTicket: TicketItem}) => {
-    const {loadingSubmitEdit, editTicket, loadTicketUpdate, form, handleChange} = useTicketList(closeModal);
+    const {loadingSubmitEdit, editTicket, loadTicketUpdate, form, handleChange} = useTicketList(undefined, closeModal);
 
     useEffect(() => {
         loadTicketUpdate(actualTicket);
-    },[actualTicket])
+    },[actualTicket, loadTicketUpdate])
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();

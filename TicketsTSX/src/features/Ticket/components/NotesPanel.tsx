@@ -1,6 +1,6 @@
 import { useTickets } from '../context/TicketContext';
 
-export const NotesPanel = ({ openModal } : {openModal: (modal: any, payload?: null) => void}) => {
+export const NotesPanel = ({ openModal } : {openModal: (modal: string, payload?: unknown) => void}) => {
     const {notes} = useTickets();
     
   return (

@@ -3,7 +3,7 @@ import { useLogin } from "../context/LoginContext";
 
 const LoginScreen = () => {
 
-  const {loginData, setLoginData, mutate, error, isError, isPending} = useLogin();
+  const {loginData, setLoginData, mutate, error, isError} = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   
   const handleSubmit = async (e: { preventDefault: () => void; }) => {

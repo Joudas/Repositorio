@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { highPriority, overview, ticketsCompleted, ticketsInProgress, ticketsPending } from '@/services/ticketsService';
 import { useQuery } from '@tanstack/react-query';
 

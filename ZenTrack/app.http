@@ -1,0 +1,82 @@
+GET http://localhost:3001/api/users/
+
+###
+POST http://localhost:3001/api/users/ 
+content-type: application/json
+
+{
+    "name": "test3",
+    "password": "123456",
+    "email": "test3@gmail.com"
+}
+###
+POST http://localhost:3001/api/auth/login 
+content-type: application/json
+
+{
+    "email": "test3@gmail.com",
+    "password": "123456"
+}
+
+
+
+###
+POST http://localhost:3001/api/board/
+content-type: application/json
+
+{
+    "name": "test"
+}
+
+###
+# Encontrar Una board por el id
+GET http://localhost:3001/api/board/3b9160ac-fddb-4c78-9620-ead9e3f34091/test
+
+
+###
+# Encontrar todas las board del usuario
+GET http://localhost:3001/api/board/
+
+
+
+###
+
+POST http://localhost:3001/api/board/card
+content-type: application/json
+
+{
+    "boardId": "3b9160ac-fddb-4c78-9620-ead9e3f34091",
+    "title": "Testing Cards"
+}
+
+###
+# Encontrar todas las card de una board
+GET http://localhost:3001/api/board/card/g/d08929d3-c24f-48a6-b04c-c95b9a77d6a4
+
+
+
+###
+# Encontrar la card por su ID
+GET http://localhost:3001/api/board/card/d08929d3-c24f-48a6-b04c-c95b9a77d6a4
+
+
+
+###
+# Encontrar InBox por id board
+GET http://localhost:3001/api/board/card/gi/d08929d3-c24f-48a6-b04c-c95b9a77d6a4
+
+
+###
+
+
+POST http://localhost:3001/api/board/card/todo
+content-type: application/json
+
+{
+    "boardId": "3b9160ac-fddb-4c78-9620-ead9e3f34091",
+    "cardId": "94e31f9f-00fa-43e3-b906-92964b48eacd",
+    "title": "test Card"
+}
+
+###
+GET http://localhost:3001/api/board/card/todo/g/3b9160ac-fddb-4c78-9620-ead9e3f34091

@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { useQueryClient } from '@/Hooks/useQuery';
 import { changeStateTicket, createTicket, deleteTicket, getTicketProject, updateTicket } from '@/services/ticketsService';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import type { TicketForm } from '../types';
+import type { TicketForm, TicketItem } from '../types';
 import { useAlertStore } from '@/Store/alertStore';
+
+const defaultForm: TicketForm = {
+  name: "",
+  description: "",
+  state: "pending",
+  priority: "low",
+};
 
 export function useTicketList(projectID?: string | null, onSuccess?: () => void) {
   const queryClient = useQueryClient();
   const { openAlert } = useAlertStore();
+  const [form, setForm] = useState<TicketForm>(defaultForm);
 
   const { data: projectData, isPending: isPendingTicket,
     isError: isErrorTicket, error: errorTicket } = useQuery({
@@ -14,9 +23,23 @@ export function useTicketList(projectID?: string | null, onSuccess?: () => void)
       queryFn: () => getTicketProject(projectID)
     });
 
-  const listTickets = Array.isArray(projectData?.tickets)
+  const listTickets: TicketItem[] = Array.isArray(projectData?.tickets)
     ? projectData.tickets
     : (projectData ?? []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const loadTicketUpdate = (ticket: TicketItem) => {
+    setForm({
+      name: ticket.name,
+      description: ticket.description,
+      state: ticket.state,
+      priority: ticket.priority,
+    });
+  };
 
   const { mutate: submitTicket, isPending: loadingForm } = useMutation({
     mutationFn: (ticketForm: TicketForm) => createTicket(ticketForm, projectID),
@@ -32,8 +55,8 @@ export function useTicketList(projectID?: string | null, onSuccess?: () => void)
     }
   });
 
-  const { mutate: editTicket } = useMutation({
-    mutationFn: ({ form, id }: { form: TicketForm, id: string }) => updateTicket(form, id), //form, id
+  const { mutate: editTicket, isPending: loadingSubmitEdit } = useMutation({
+    mutationFn: (id: string) => updateTicket(form, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['listTickets', projectID] })
       openAlert('Ticket actualizado correctamente');
@@ -45,8 +68,9 @@ export function useTicketList(projectID?: string | null, onSuccess?: () => void)
       resetForm();
     }
   });
+
   const { mutate: deleteTickets } = useMutation({
-    mutationFn: deleteTicket, //form, id
+    mutationFn: deleteTicket,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['listTickets', projectID] })
       openAlert('Ticket eliminado correctamente');
@@ -58,11 +82,12 @@ export function useTicketList(projectID?: string | null, onSuccess?: () => void)
       resetForm();
     }
   });
+
   const { mutate: changeState, isPending: loadingStateChange } = useMutation({
-    mutationFn: ({ state, ticketID }: { state: string; ticketID: string }) => { console.log(state, ticketID); return changeStateTicket(state, ticketID) },
+    mutationFn: ({ state, ticketID }: { state: string; ticketID: string }) => changeStateTicket(state, ticketID),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['listTickets', projectID] })
-      openAlert('Ticket actualizar correctamente');
+      openAlert('Ticket actualizado correctamente');
     },
     onError: () => {
       openAlert('Hubo un error al actualizar el ticket');
@@ -73,12 +98,14 @@ export function useTicketList(projectID?: string | null, onSuccess?: () => void)
   });
 
   const resetForm = () => {
+    setForm(defaultForm);
     onSuccess?.();
   };
 
-
   return {
-    listTickets, isPendingTicket, isErrorTicket, errorTicket, loadingForm, loadingStateChange,
-    submitTicket, editTicket, deleteTickets, changeState, resetForm
+    listTickets, isPendingTicket, isErrorTicket, errorTicket,
+    loadingForm, loadingSubmitEdit, loadingStateChange,
+    submitTicket, editTicket, deleteTickets, changeState,
+    loadTicketUpdate, handleChange, form, setForm, resetForm
   };
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useRegister } from '../context/RegisterContext';
 
@@ -8,17 +8,14 @@ const RegisterScreen = () => {
 
   const [stateRegister, setStateRegister] = useState(false);
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (registerData.name && registerData.lastname && registerData.email) {
       handleState(2);
     } else {
       setStateRegister(true);
     }
   }
-
-  useEffect(() => {
-
-  },[])
 
 
   return (

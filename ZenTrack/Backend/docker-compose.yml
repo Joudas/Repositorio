@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Nuestro contenedor del Backend (Node.js + Express)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zentrack-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://jdas:12345@db:5432/mytrello?schema=public
+      - PORT=3001
+    depends_on:
+      - db
+
+  # Tu contenedor de PostgreSQL (Configurado igual a como lo tenías antes)
+  db:
+    image: postgres:latest
+    container_name: mytrello
+    restart: always
+    environment:
+      POSTGRES_USER: jdas
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: mytrello
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

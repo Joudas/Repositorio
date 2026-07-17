@@ -1,11 +1,9 @@
 import IconDelete from '@/Components/Icon/IconDelete';
 import IconEdit from '@/Components/Icon/IconEdit';
-import { useContext } from 'react';
-import TicketContext from '../context/TicketContext';
-import useTicket from '@/features/DashBoard/hooks/useTicket';
 import { useTicketList } from '../hooks/useTicketList';
+import type { TicketItem, stateType } from '../types';
 
-export const TicketActions = ({ openModal, actualTicket }) => {
+export const TicketActions = ({ openModal, actualTicket }: { openModal: (modal: string, payload?: unknown) => void; actualTicket: TicketItem | null }) => {
     return (
         <div className="">
             {/* State change button or completed badge */}
@@ -21,7 +19,7 @@ export const TicketActions = ({ openModal, actualTicket }) => {
     )
 }
 
-export const TicketButton = ({ actualTicket, stateTicket }) => {
+export const TicketButton = ({ actualTicket, stateTicket }: { actualTicket: TicketItem | null; stateTicket: stateType }) => {
     const { changeState, loadingStateChange } = useTicketList();
     const handleChange = () => {
         if (!actualTicket) return;

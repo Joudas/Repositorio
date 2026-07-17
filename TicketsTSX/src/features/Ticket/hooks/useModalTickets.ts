@@ -3,7 +3,7 @@ import {useState} from 'react'
 const useModalTickets = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [activeModal, setActiveModal] = useState<string | null>(null)
-  const [modalPayload, setModalPayload] = useState(null)
+  const [modalPayload, setModalPayload] = useState<unknown>(null)
 
   const openModal = (modal: string, payload = null) => {
     setIsModalOpen(true);

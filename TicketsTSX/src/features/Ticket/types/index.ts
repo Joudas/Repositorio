@@ -1,8 +1,30 @@
-import type { UseMutateAsyncFunction, UseMutateFunction } from "@tanstack/react-query";
+import type { UseMutateFunction } from "@tanstack/react-query";
 
-export type TicketItem = { [key: string]: any };
+export interface TicketItem {
+  id: string;
+  name: string;
+  description: string;
+  state: string;
+  priority: string;
+  project_id?: string;
+  created_at?: string;
+  createDate?: string;
+  createdAt?: string;
+}
 
-export type NoteItem = { [key: string]: any };
+export interface NoteItem {
+  id: string;
+  note: string;
+  created_at: string;
+  author_id?: string;
+}
+
+export type TicketForm = {
+    name: string;
+    description: string;
+    state: string;
+    priority: string;
+};
 
 export type NoteForm = { note: string };
 
@@ -13,15 +35,8 @@ export type NoteContextType = {
     isPending: boolean;
     isError: boolean;
     error: Error | null;
-    submitNote: UseMutateFunction<any, Error, void, unknown>
+    submitNote: UseMutateFunction<void, Error, void, unknown>;
     resetNotes: () => void;
-};
-
-export type TicketForm = {
-    name: string;
-    description: string;
-    state: string;
-    priority: string;
 };
 
 export type TicketsContextType = {
@@ -31,7 +46,7 @@ export type TicketsContextType = {
     setTicketID: React.Dispatch<React.SetStateAction<string | null>>;
     listTickets: TicketItem[];
     setListTickets: React.Dispatch<React.SetStateAction<TicketItem[]>>;
-    loadTickets: (projectID: string) => Promise<{ ok: boolean; data?: any; message?: string }>;
+    loadTickets: (projectID: string) => Promise<{ ok: boolean; data?: TicketItem[]; message?: string }>;
     isPendingTicket: boolean;
     errorTickets: string;
     defineTicket: (id: string | null) => void;
@@ -43,56 +58,57 @@ export type TicketsContextType = {
     setFormNotes: React.Dispatch<React.SetStateAction<NoteForm>>;
     notes: NoteItem[];
     isPending: boolean;
-    isError: boolean
+    isError: boolean;
     error: Error | null;
-    submitNote: () => Promise<{ ok: boolean; data?: any; message?: string }>;
+    submitNote: () => Promise<{ ok: boolean; data?: NoteItem; message?: string }>;
     resetNotes: () => void;
 
     /* Ticket form/actions */
     loadingForm: boolean;
+    loadingSubmitEdit: boolean;
     loadingStateChange: boolean;
     errorForm: string | null;
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-    submitTicket: UseMutateFunction<any, Error, TicketForm, unknown>;
-    editTicket: (id: string) => Promise<{ ok: boolean; data?: any; message?: string }>;
-    deleteTickets: (id: string) => Promise<{ ok: boolean; data?: any; message?: string }>;
+    submitTicket: UseMutateFunction<TicketItem, Error, TicketForm, unknown>;
+    editTicket: (id: string) => void;
+    deleteTickets: (id: string) => void;
+    loadTicketUpdate: (ticket: TicketItem) => void;
     resetForm: () => void;
     form: TicketForm;
-    changeState: UseMutateFunction<any, Error, {
+    changeState: UseMutateFunction<TicketItem, Error, {
         state: string;
         ticketID: string;
     }, unknown>;
     setForm: React.Dispatch<React.SetStateAction<TicketForm>>;
 };
 
-
 export type priorityType = {
     state: string;
     css: string;
     color: string;
-}
+};
 export type stateType = {
     state: string;
     label: string;
     next: string;
     css: string;
     border: string;
-}
+};
 export type TicketDetailProps = {
     priorityMap: {
         low: priorityType;
         medium: priorityType;
         high: priorityType;
-    }
+    };
     statesMap: {
         completed: stateType;
         in_progress: stateType;
         pending: stateType;
-    }
-    openModal: (modal: any, payload?: null) => void
-    actualTicket: TicketItem
-    stateTicket: any
-}
+    };
+    openModal: (modal: string, payload?: unknown) => void;
+    actualTicket: TicketItem | null;
+    stateTicket: stateType;
+};
 
 export type TicketListType = {
     priorityMap: {
@@ -107,7 +123,7 @@ export type TicketListType = {
     };
     listTickets: TicketItem[];
     actualTicket: TicketItem | null;
-    defineTicket: any;
+    defineTicket: (id: string | null) => void;
     isPending: boolean;
-    openModal: (modal: any, payload?: null) => void
-}
+    openModal: (modal: string, payload?: unknown) => void;
+};

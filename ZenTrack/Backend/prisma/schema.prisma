@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  boards    Board[]
+}
+
+model Board {
+  id     String @id @default(uuid())
+  name   String
+  theme  String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  card  Card[]
+}
+
+model Card {
+  id          String    @id @default(uuid())
+  title       String
+  position    Int
+
+  boardId     String
+  board       Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  
+  todos       Todo[]
+}
+
+model Todo {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  energy      Energy?   @default(MEDIA)
+  comments    String?
+
+  position    Int
+  check       Boolean @default(false)
+  endDate     DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  cardId      String
+  card        Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+
+enum Energy {
+  BAJA
+  MEDIA
+  ALTA
+}

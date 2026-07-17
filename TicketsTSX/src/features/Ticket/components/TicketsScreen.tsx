@@ -19,7 +19,7 @@ const TicketsScreen = () => {
     const { id: projectID } = useParams<{ id: string }>();
 
     const { listTickets, defineTicket, isPendingTicket,
-        ticketID, deleteTickets } = useTickets();
+        ticketID } = useTickets();
     const { isModalOpen, openModal, closeModal, activeModal,
         modalPayload } = useModalTickets();
     const { isOpen, message } = useAlertStore();
@@ -38,7 +38,7 @@ const TicketsScreen = () => {
         in_progress: { state: 'En Progreso', label: 'Completar Ticket', next: 'completed', css: 'bg-blue-500 hover:bg-blue-600', border: 'ticket-border-blue' },
         pending: { state: 'Pendiente', label: 'Comenzar Ticket', next: 'in_progress', css: 'bg-yellow-500 hover:bg-yellow-600', border: 'ticket-border-yellow' },
     } as const;
-    const stateTicket = statesMap[actualTicket?.state as keyof typeof statesMap] ?? { label: 'Comenzar Ticket', next: 'in_progress', css: 'bg-yellow-500 hover:bg-yellow-600' };
+    const stateTicket = statesMap[actualTicket?.state as keyof typeof statesMap] ?? { state: 'pending', label: 'Comenzar Ticket', next: 'in_progress', css: 'bg-yellow-500 hover:bg-yellow-600', border: 'ticket-border-yellow' };
 
     const priorityMap = {
         low: { state: 'Baja', css: 'bg-green-500', color: 'text-green-500' },
@@ -80,7 +80,7 @@ const TicketsScreen = () => {
 
             {(isModalOpen && activeModal === 'ticket') && <CreateTicketModal projectID={projectID} closeModal={closeModal} />}
             {(isModalOpen && activeModal === 'note') && <CreateNoteModal closeModal={closeModal} />}
-            {(isModalOpen && activeModal === 'delete') && <ConfirmDeleteModal closeModal={closeModal} actualTicket={modalPayload} deleteTickets={deleteTickets} />}
+            {(isModalOpen && activeModal === 'delete') && <ConfirmDeleteModal closeModal={closeModal} actualTicket={modalPayload} />}
             {(isModalOpen && activeModal === 'edit') && <EditTicketModal closeModal={closeModal} actualTicket={modalPayload} />}
             {isOpen && <Alerts message={message} />}
         </div>

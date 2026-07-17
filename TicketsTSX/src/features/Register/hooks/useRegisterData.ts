@@ -1,4 +1,4 @@
-import React, { useState, type ChangeEvent } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import type { RegisterData } from '../types';
 import { registerUser } from '@/services/authService';
 import { useMutation } from '@tanstack/react-query';
