@@ -40,14 +40,14 @@ model Card {
 }
 
 model Todo {
-  id          String  @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
   energy      Energy?   @default(MEDIA)
-  comments    String?
+  // comments    String?
 
   position    Int
-  check       Boolean @default(false)
+  check       Boolean   @default(false)
   endDate     DateTime?
 
   createdAt   DateTime  @default(now())
@@ -55,6 +55,16 @@ model Todo {
 
   cardId      String
   card        Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  comments    Comment[]
+}
+
+model Comment {
+  id          String    @id @default(uuid())
+  text        String
+
+  todoId      String
+  todo        Todo      @relation(fields: [todoId], references: [id], onDelete: Cascade)
 }
 
 

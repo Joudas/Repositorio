@@ -26,12 +26,12 @@ export default function Checkbox({check}: {check: boolean}) {
       variants={checkboxVariants}
       className="absolute left-2 flex items-center justify-center w-5 h-5 rounded-full"
       >
-          {
-              checked ? 
-              <FaCheckCircle color="#16DB00" className="w-full h-full" />
-              : 
-              <RiCheckboxBlankCircleLine className="w-full h-full" />
-          }
-      </motion.div>
+        {
+            checked ? 
+            <FaCheckCircle color="#16DB00" className="w-full h-full" />
+            : 
+            <RiCheckboxBlankCircleLine className="w-full h-full" />
+        }
+    </motion.div>
   );
 }

@@ -2,7 +2,8 @@ import { Router, type Request, type Response } from "express";
 import { prisma } from "../utils/db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
-import { createTodoSchema, updateTodoSchema, reorderTodosSchema } from "../schemas/todo.js";
+import { createTodoSchema, updateTodoSchema, reorderTodosSchema, moveTodoSchema } from "../schemas/todo.js";
+import type { MoveTodoInput } from "../schemas/todo.js";
 
 const router: Router = Router();
 
@@ -12,7 +13,7 @@ router.post(
   requireAuth,
   validate(createTodoSchema),
   async (req: Request, res: Response): Promise<void> => {
-    const { cardId, title, description, energy, comments, endDate } = req.body;
+    const { cardId, title, description, energy, comments: _comments, endDate } = req.body;
 
     // Verificar ownership: card → board → user
     const card = await prisma.card.findFirst({
@@ -38,14 +39,13 @@ router.post(
         title,
         description,
         energy,
-        comments,
         endDate: endDate ? new Date(endDate) : undefined,
         position,
         cardId,
       },
       select: {
         id: true, title: true, description: true, position: true,
-        check: true, energy: true, comments: true, endDate: true,
+        check: true, energy: true, endDate: true,
       },
     });
 
@@ -64,21 +64,13 @@ router.get(
       where: { id: todoId },
       select: {
         id: true, title: true, description: true, position: true,
-        check: true, energy: true, comments: true, endDate: true,
+        check: true, energy: true, endDate: true, cardId: true,
+        card: { select: { board: { select: { userId: true } } } },
       },
     });
 
-    if (!todo) {
+    if (!todo || todo.card.board.userId !== req.userId) {
       res.status(404).json({ error: "Todo no encontrado" });
-      return;
-    }
-
-    // Verificar ownership a través del board
-    const card = await prisma.board.findFirst({
-      where: { id: todo.cardId, userId: req.userId! },
-    });
-    if (!card) {
-      res.status(403).json({ error: "No autorizado" });
       return;
     }
 
@@ -97,7 +89,8 @@ router.get(
       where: { cardId },
       select: {
         id: true, title: true, description: true, position: true,
-        check: true, energy: true, comments: true, endDate: true,
+        check: true, energy: true, endDate: true, cardId: true,
+        comments: { select: { id: true, text: true } },
       },
       orderBy: { position: "asc" },
     });
@@ -139,9 +132,69 @@ router.put(
       where: { cardId },
       select: {
         id: true, title: true, description: true, position: true,
-        check: true, energy: true, comments: true, endDate: true,
+        check: true, energy: true, endDate: true,
+        comments: { select: { id: true, text: true } },
       },
       orderBy: { position: "asc" },
+    });
+
+    res.json(updated);
+  }
+);
+
+// ─── PUT /move/:id — Mover un todo entre cards ───────────────
+router.put(
+  "/move/:id",
+  requireAuth,
+  validate(moveTodoSchema),
+  async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id);
+    const { targetCardId, position } = req.body as MoveTodoInput;
+
+    // Ownership: todo → sourceCard → board → user
+    const existing = await prisma.todo.findFirst({
+      where: { id },
+      include: { card: { include: { board: { select: { userId: true } } } } },
+    });
+
+    if (!existing || existing.card.board.userId !== req.userId) {
+      res.status(404).json({ error: "Todo no encontrado" });
+      return;
+    }
+
+    // Ownership: targetCard → board → user
+    const targetCard = await prisma.card.findFirst({
+      where: { id: targetCardId },
+      include: { board: { select: { userId: true } } },
+    });
+
+    if (!targetCard || targetCard.board.userId !== req.userId) {
+      res.status(404).json({ error: "Card destino no encontrada" });
+      return;
+    }
+
+    // Si position no se envía, asignar última posición + 1 en la card destino
+    let newPosition = position;
+    if (newPosition === undefined) {
+      const lastTodo = await prisma.todo.findFirst({
+        where: { cardId: targetCardId },
+        orderBy: { position: "desc" },
+        select: { position: true },
+      });
+      newPosition = (lastTodo?.position ?? -1) + 1;
+    }
+
+    const updated = await prisma.todo.update({
+      where: { id },
+      data: {
+        cardId: targetCardId,
+        position: newPosition,
+      },
+      select: {
+        id: true, title: true, description: true, position: true,
+        check: true, energy: true, endDate: true, cardId: true,
+        comments: { select: { id: true, text: true } },
+      },
     });
 
     res.json(updated);
@@ -170,7 +223,7 @@ router.put(
     // Construir data dinámicamente con los campos que vienen en el body
     const updatableFields = [
       "title", "description", "position", "check",
-      "energy", "comments", "endDate",
+      "energy", "endDate",
     ] as const;
 
     const data: Record<string, unknown> = {};
@@ -190,7 +243,7 @@ router.put(
       data,
       select: {
         id: true, title: true, description: true, position: true,
-        check: true, energy: true, comments: true, endDate: true,
+        check: true, energy: true, endDate: true,
       },
     });
 

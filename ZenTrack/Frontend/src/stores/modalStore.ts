@@ -1,5 +1,5 @@
+import type { Todo } from "@/type/Todo";
 import { create } from "zustand";
-import type { Todo } from "@/services/todo";
 
 interface ModalState {
   todo: Todo | null;

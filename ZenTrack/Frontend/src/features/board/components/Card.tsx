@@ -1,13 +1,36 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { GrContract, GrExpand } from "react-icons/gr";
+
 import { type Card } from "@/services/card";
-import { getTodo, type Todo as TodoType } from "@/services/todo";
+import { getTodo } from "@/services/todo";
+
 import Todo from "./Todo";
 import TodoAdd from "./TodoAdd";
 
-export default function Card({ card }: { card: Card }) {
+// Dnd-kit
+import {useDroppable} from '@dnd-kit/react';
+import { useHandleClick } from "../hooks/useHandleClick";
+
+type Props = {
+  card: Card;
+}
+
+export default function Card({ card }: Props) {
+
+    const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [isAdd, setIsAdd] = useState(false);
+  const {ref} = useDroppable({
+    id: card.id,
+  });
+
+  const setClose = () => {
+      setIsAdd(false);
+    }
+      
+      useHandleClick(containerRef, setClose);
 
   const [contractCard, setContractCard] = useState(false);
 
@@ -17,8 +40,8 @@ export default function Card({ card }: { card: Card }) {
   });
   
   return (
-    <div className="gap-4 overflow-x-auto text-sm">
-      <div className={`bg-gray-6 min-w-8 rounded-lg  pb-2 pt-4 px-2 flex flex-col gap-4 self-start ${contractCard ? "" : "custom-scroll"}`}>
+    <div className="gap-4 overflow-x-auto text-sm" ref={ref} >
+      <div ref={containerRef} className={`bg-gray-6 min-w-8 rounded-lg pb-2 pt-4 px-2 flex flex-col gap-4 self-start ${contractCard ? "" : "custom-scroll"}`}>
       {
         contractCard ? 
         
@@ -42,12 +65,9 @@ export default function Card({ card }: { card: Card }) {
               <GrContract color="white"/>
             </span>
           </div>
-
-          {todos?.map((td: TodoType) => (
-            <Todo todo={td} key={td.id} />
-          ))}
-
-          <TodoAdd cardId={card.id}/>
+          {todos?.map(todo => <Todo todo={todo} key={todo.id} />)}
+          
+          <TodoAdd cardId={card.id} isAdd={isAdd} setIsAdd={setIsAdd} />
         </div>
       }
       </div>

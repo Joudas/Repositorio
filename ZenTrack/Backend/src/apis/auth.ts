@@ -61,10 +61,26 @@ router.post("/register", validate(registerSchema), async (req: Request, res: Res
     select: { id: true, email: true, name: true },
   });
 
+  // Crear board por defecto con 3 cards
+  const board = await prisma.board.create({
+    data: {
+      name: "Tutorial Board",
+      userId: user.id,
+      card: {
+        create: [
+          { title: "InBox", position: 0 },
+          { title: "Doing", position: 1 },
+          { title: "Done", position: 2 },
+        ],
+      },
+    },
+    select: { id: true, name: true },
+  });
+
   const token = generateToken(user);
   setAuthCookie(res, token);
 
-  res.status(201).json(user);
+  res.status(201).json({ ...user, board });
 });
 
 // ─── POST /login — Iniciar sesión ─────────────────────────

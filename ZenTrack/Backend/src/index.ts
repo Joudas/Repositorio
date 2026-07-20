@@ -8,6 +8,7 @@ import authRouter from "./apis/auth.js";
 import boardRouter from "./apis/board.js";
 import cardRouter from "./apis/card.js";
 import todoRouter from "./apis/todo.js";
+import commentRouter from "./apis/comment.js";
 
 const app: Express = express();
 const PORT = process.env["PORT"] ?? 3001;
@@ -43,6 +44,7 @@ app.use("/api/users", userRouter);
 // Autenticación: register, login, logout, me
 app.use("/api/auth", authRouter);
 
+app.use("/api/board/card/todo/comment", commentRouter);
 app.use("/api/board/card/todo", todoRouter);
 app.use("/api/board/card", cardRouter);
 app.use("/api/board", boardRouter);

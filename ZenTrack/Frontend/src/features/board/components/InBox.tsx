@@ -1,11 +1,12 @@
-import { Button } from "@/components/UI";
 import { useState, useRef, useEffect, useCallback } from "react";
-import TodoAdd from "./TodoAdd";
+
 import { useQuery } from "@tanstack/react-query";
 import { getInBox } from "@/services/card";
 import type { Board } from "@/services/board";
-import { getTodo, type Todo as TodoType } from "@/services/todo";
-import Todo from "./Todo";
+
+import { getTodo } from "@/services/todo";
+import InBoxCard from "./InBoxCard";
+
 
 interface Props {
   board: Board | undefined;
@@ -82,15 +83,8 @@ export default function InBox({board, isBoard} : Props) {
             </div>
           </div>
         </div>
-        <div className="px-2 gap-3 flex flex-col">
-          <div className="bg-gray-6 p-2 min-h-8 w-full rounded-lg">
-            <TodoAdd cardId={card?.id}/>
-          </div>
-
-          {todos?.map((td: TodoType) => (
-            <Todo todo={td} key={td.id} />
-          ))}
-        </div>
+        
+        { card && todos && <InBoxCard todos={todos} card={card} />}
       </div>
 
       {/* Drag handle */}

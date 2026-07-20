@@ -36,6 +36,12 @@ export const reorderTodosSchema = z.object({
   ),
 });
 
+export const moveTodoSchema = z.object({
+  targetCardId: z.string(),
+  position: z.number().int().optional(),
+});
+
 export type CreateTodoInput = z.infer<typeof createTodoSchema>;
 export type UpdateTodoInput = z.infer<typeof updateTodoSchema>;
 export type ReorderTodosInput = z.infer<typeof reorderTodosSchema>;
+export type MoveTodoInput = z.infer<typeof moveTodoSchema>;

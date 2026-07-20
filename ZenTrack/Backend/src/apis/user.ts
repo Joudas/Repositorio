@@ -49,28 +49,6 @@ router.post("/", validate(createUserSchema), async (req: Request, res: Response)
       name,
       email, 
       password: hashedPassword, 
-      boards: {
-        create: {
-          name: "Tutorial Board",
-          card: {
-            create: [
-              {
-                title: 'InBox',
-                position: 0
-              },
-              {
-                title: 'Today',
-                position: 1,
-                
-              },
-              {
-                title: 'Doing',
-                position: 2
-              }
-            ]
-          }
-        }
-      }
      },
     select: { id: true, email: true, name: true, createdAt: true },
   });

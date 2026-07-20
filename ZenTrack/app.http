@@ -67,8 +67,11 @@ GET http://localhost:3001/api/board/card/gi/d08929d3-c24f-48a6-b04c-c95b9a77d6a4
 
 
 ###
+#Encontrar un todo por su card ID
+GET http://localhost:3001/api/board/card/todo/g/8b72cc31-0e1b-4478-90cf-b968112b4d2d
 
 
+###
 POST http://localhost:3001/api/board/card/todo
 content-type: application/json
 
@@ -79,4 +82,17 @@ content-type: application/json
 }
 
 ###
+#
 GET http://localhost:3001/api/board/card/todo/g/3b9160ac-fddb-4c78-9620-ead9e3f34091
+
+
+###
+POST http://localhost:3001/api/board/card/todo/comment
+content-type: application/json
+
+{
+    "todoId": "2199254c-e6b5-4d94-872e-09c82445492b",
+    "text": "test Comment"
+}
+###
+GET http://localhost:3001/api/board/card/todo/comment/g/2199254c-e6b5-4d94-872e-09c82445492b

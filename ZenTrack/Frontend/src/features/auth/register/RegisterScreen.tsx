@@ -38,8 +38,6 @@ export default function RegisterScreen() {
     mutationFn: () => registerUser(email, password, name || undefined),
     onSuccess: (user) => {
       useAuthStore.setState({ user });
-      // Create tutorial board
-      boardMutation.mutate("ZenTrack Tutorial");
       navigate("/board");
     },
   });

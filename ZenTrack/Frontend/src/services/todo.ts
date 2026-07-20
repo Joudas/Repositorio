@@ -1,15 +1,5 @@
+import type { Todo } from "@/type/Todo";
 import { api } from "./api"
-
-export type Todo = {
-  id: string;
-  title: string;
-  description: string | null;
-  energy: "BAJA" | "MEDIA" | "ALTA" | null;
-  comments: string | null;
-  position: number;
-  check: boolean;
-  endDate: string | null;
-};
 
 export const postTodo = async (cardId: string, title: string): Promise<Todo> => {
   return api.post<Todo>("/api/board/card/todo", { cardId, title });
@@ -29,4 +19,12 @@ export const updateTodo = async (id: string, data: Partial<Todo>): Promise<Todo>
 
 export const deleteTodo = async (id: string): Promise<void> => {
   return api.delete<void>(`/api/board/card/todo/${id}`);
+};
+
+export const moveTodo = async (id: string, targetCardId: string): Promise<Todo> => {
+  return api.put<Todo>(`/api/board/card/todo/move/${id}`, { targetCardId });
+};
+
+export const reorderTodos = async (cardId: string, todos: { id: string; position: number }[]): Promise<Todo[]> => {
+  return api.put<Todo[]>("/api/board/card/todo/reorder", { cardId, todos });
 };

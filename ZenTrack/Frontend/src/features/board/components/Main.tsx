@@ -3,6 +3,8 @@ import Card from "./Card";
 import { useQuery } from "@tanstack/react-query";
 import { getCardList } from "@/services/card";
 import { SlOptions } from "react-icons/sl";
+import AddCardForm from "./AddCardForm";
+
 
 interface Props {
   board: Board | undefined;
@@ -29,9 +31,11 @@ export default function Main({ board }: Props) {
         
         {
           cards && cards?.data?.map((card) => {
-            return <Card card={card} key={card.id}/>
+            return <Card card={card} key={card.id} />
           })
         }
+        <AddCardForm/>
+
       </div>
     </div>
   );

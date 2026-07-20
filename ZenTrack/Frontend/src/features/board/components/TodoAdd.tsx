@@ -5,11 +5,16 @@ import { GoPlus } from "react-icons/go";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postTodo } from '@/services/todo';
 
-export default function TodoAdd({cardId} : {cardId:string}) {
+type Props = {
+    setIsAdd: React.Dispatch<React.SetStateAction<boolean>>;
+    isAdd: boolean;
+    cardId:string;
+}
+
+export default function TodoAdd({cardId, setIsAdd, isAdd} : Props) {
 
     const queryClient = useQueryClient();
 
-    const [isAdd, setIsAdd] = useState(false);
     const [inputAdd, setInputAdd] = useState("");
 
     const addTodo = useMutation({

@@ -228,13 +228,13 @@ router.put(
 
     // Construir data dinámicamente con los campos que vienen en el body
     const updatableFields = [
-      "title", "description", "energy", "comments", "color", "endDate",
+      "title",
     ] as const;
 
     const data: Record<string, unknown> = {};
     for (const field of updatableFields) {
       if (req.body[field] !== undefined) {
-        data[field] = field === "endDate" ? new Date(req.body[field]) : req.body[field];
+        data[field] = req.body[field];
       }
     }
 
@@ -247,8 +247,7 @@ router.put(
       where: { id },
       data,
       select: {
-        id: true, title: true, description: true, position: true,
-        energy: true, comments: true, color: true, endDate: true,
+        id: true, title: true, position: true,
       },
     });
 

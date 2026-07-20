@@ -49,7 +49,7 @@ export default function FormBoard({ setFormBoard }: Props) {
         </div>
       </div>
       <div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 justify-center p-2 p-4 mb-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6 justify-center p-4 mb-2">
           <div>
             <label htmlFor="board-name" className="self-start px-2 text-xs grid gap-2">
               Board Title

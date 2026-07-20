@@ -24,7 +24,7 @@ type Props = {
   todo: Todo;
 }
 
-export default function Todo({ todo }: Props) {
+export default function TodoOverlay({ todo }: Props) {
     const id = todo.id;
     const {ref, isDragSource} = useDraggable({
       id,
@@ -44,6 +44,7 @@ export default function Todo({ todo }: Props) {
         initial="rest"
         whileHover="hover"
         className={`
+            ${isDragSource && "border-2 border-brand-muted rotate-2 transform"}
             rounded-md w-full bg-gray-5 text-gray-1 p-2 px-4 cursor-pointer
            hover:bg-gray-4 relative flex items-center overflow-hidden list-none`}
     >
