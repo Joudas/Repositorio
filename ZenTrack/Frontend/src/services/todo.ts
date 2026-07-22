@@ -21,8 +21,8 @@ export const deleteTodo = async (id: string): Promise<void> => {
   return api.delete<void>(`/api/board/card/todo/${id}`);
 };
 
-export const moveTodo = async (id: string, targetCardId: string): Promise<Todo> => {
-  return api.put<Todo>(`/api/board/card/todo/move/${id}`, { targetCardId });
+export const moveTodo = async (id: string, targetCardId: string, position?: number): Promise<Todo> => {
+  return api.put<Todo>(`/api/board/card/todo/move/${id}`, { targetCardId, position });
 };
 
 export const reorderTodos = async (cardId: string, todos: { id: string; position: number }[]): Promise<Todo[]> => {

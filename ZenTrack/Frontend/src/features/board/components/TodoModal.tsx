@@ -1,47 +1,60 @@
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useModalStore } from "@/stores/modalStore";
-import { deleteTodo, updateTodo } from "@/services/todo";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+
 import { Button } from "@/components/UI";
 import Comment from "./Comment";
 
 // Icons
 import { MdOutlineDescription } from "react-icons/md";
-import { RiCheckboxBlankCircleLine } from "react-icons/ri";
-import { FaCheckCircle } from "react-icons/fa";
+import AnimationPresenceCheck from "./AnimationPresenceCheck";
 
+import type { Todo } from "@/type/Todo";
+import { deleteTodo, updateTodo } from "@/services/todo";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function TodoModal() {
   
   const { todo, isOpen, close } = useModalStore();
+  if(!todo) return;
   const queryClient = useQueryClient();
   
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [energy, setEnergy] = useState<"BAJA" | "MEDIA" | "ALTA">("MEDIA");
-  const [endDate, setEndDate] = useState("");
-  const [checked, setChecked] = useState(false);
+  const [title, setTitle] = useState(todo.title);
+  const [description, setDescription] = useState(todo.description ?? "");
+  const [energy, setEnergy] = useState<"BAJA" | "MEDIA" | "ALTA">(todo.energy ?? "MEDIA");
+  const [endDate, setEndDate] = useState(todo.endDate ?? "");
+  const [checked, setChecked] = useState(todo.check ?? false);
 
-  // Sincronizar estado local cuando se abre el modal con un todo
-  useEffect(() => {
-    if (todo) {
-      setTitle(todo.title);
-      setDescription(todo.description ?? "");
-      setEnergy(todo.energy ?? "MEDIA");
-
-      setEndDate(todo.endDate ?? "");
-      setChecked(todo.check ?? "");
-    }
-  }, [todo]);
-
+  const toggleMutation = useMutation({
+    mutationFn: () => updateTodo(todo.id, { check: !todo.check }),
+    onMutate: async () => {
+      // Optimistic update: cambiar el check inmediatamente en el cache
+      const previous = queryClient.getQueryData<Todo[]>(["todos", todo.cardId]);
+      queryClient.setQueryData<Todo[]>(["todos", todo.cardId], (old) =>
+        old?.map((t) => (t.id === todo.id ? { ...t, check: !todo.check } : t))
+      );
+      return { previous };
+    },
+    onSuccess: () => {
+      setChecked(!checked);
+    },
+    onError: (_err, _vars, context) => {
+      // Rollback si la API falla
+      if (context?.previous) {
+        queryClient.setQueryData(["todos", todo.cardId], context.previous);
+      }
+    },
+  });
 
   // Update Todo
   const updateMutation = useMutation({
     mutationFn: (data: Record<string, unknown>) => updateTodo(todo!.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] }); // Need card ID
+      queryClient.invalidateQueries({ queryKey: ["todos", todo!.cardId] });
       close();
+    },
+    onError: (err) => {
+      console.error("Error al actualizar todo:", err);
     },
   });
 
@@ -57,6 +70,7 @@ export default function TodoModal() {
 
   const handleSave = () => {
     const data: Record<string, unknown> = { title };
+    data.check = checked;
     if (description !== (todo?.description ?? "")) data.description = description;
     if (energy !== (todo?.energy ?? "MEDIA")) data.energy = energy;
     if (endDate !== (todo?.endDate ?? "")) data.endDate = endDate;
@@ -88,13 +102,8 @@ export default function TodoModal() {
               <div className="space-y-4 w-full">
                 {/* Title */}
                 <div className="flex items-center">
-                  <div className="w-6 h-6 cursor-pointer" onClick={() => setChecked(!checked)}>
-                    {
-                        checked ? 
-                        <FaCheckCircle color="#16DB00" className="w-full h-full" />
-                        : 
-                        <RiCheckboxBlankCircleLine color="#FFFFFF" className="w-full h-full" />
-                    }
+                  <div className="w-6 h-6 cursor-pointer" onClick={() => toggleMutation.mutate()} >
+                    <AnimationPresenceCheck check={checked} />
                   </div>
                   <input
                     value={title}

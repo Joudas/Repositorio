@@ -6,8 +6,12 @@ export type Card = {
     position?: number,
 };
 
-export const postCard = async (name: string): Promise<Card> => {
-  return api.post<Card>("/api/board/card", { name });
+export const postCard = async (boardId: string, title: string): Promise<Card> => {
+  return api.post<Card>("/api/board/card", { boardId, title });
+};
+
+export const deleteCard = async (id: string): Promise<void> => {
+  return api.delete<void>(`/api/board/card/${id}`);
 };
 
 export const getCardById = async (id: string): Promise<Card> => {
@@ -16,14 +20,6 @@ export const getCardById = async (id: string): Promise<Card> => {
 
 export const getCardList = async (boardId: string): Promise<Card[]> => {
   return api.get<Card[]>(`/api/board/card/g/${boardId}`);
-};
-
-export const deleteBoard = async (id: string, body: Card): Promise<Card> => {
-  return api.put<Card>(`/api/board/card${id}`, body);
-};
-
-export const updateBoard = async (id: string): Promise<Card> => {
-  return api.delete<Card>(`/api/board/card${id}`);
 };
 
 export const getInBox = async (id: string): Promise<Card> => {

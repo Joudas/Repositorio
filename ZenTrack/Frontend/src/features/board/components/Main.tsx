@@ -8,9 +8,10 @@ import AddCardForm from "./AddCardForm";
 
 interface Props {
   board: Board | undefined;
+  hoverPosition?: { cardId: string; index: number } | null;
 }
 
-export default function Main({ board }: Props) {
+export default function Main({ board, hoverPosition }: Props) {
 
   const cards = useQuery({
     queryKey: ["cards", board?.id],
@@ -31,10 +32,10 @@ export default function Main({ board }: Props) {
         
         {
           cards && cards?.data?.map((card) => {
-            return <Card card={card} key={card.id} />
+            return <Card card={card} key={card.id} boardId={board!.id} hoverPosition={hoverPosition} />
           })
         }
-        <AddCardForm/>
+        {board && <AddCardForm boardId={board.id} />}
 
       </div>
     </div>

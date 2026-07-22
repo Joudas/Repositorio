@@ -15,13 +15,13 @@ if (!rawSecret) {
 const JWT_SECRET: string = rawSecret;
 
 const SALT_ROUNDS = 10;
-const COOKIE_MAX_AGE = 1000 * 60 * 15; // 15 minutes
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 24; // 24 hours
 
 // ─── Helpers ──────────────────────────────────────────────
 
 function generateToken(user: { id: string; email: string }): string {
   return jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "24h",
   });
 }
 

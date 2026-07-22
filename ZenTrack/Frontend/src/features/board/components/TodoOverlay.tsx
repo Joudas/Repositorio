@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-
 import type { Todo } from "@/type/Todo";
 
 import { useModalStore } from "@/stores/modalStore";
@@ -8,10 +7,6 @@ import CheckBox from "./CheckBox";
 
 import { useDraggable } from "@dnd-kit/react";
 
-const containerVariants = {
-  rest: {},
-  hover: {},
-};
 const textVariants = {
   rest: { x: 0 },
   hover: {
@@ -25,9 +20,8 @@ type Props = {
 }
 
 export default function TodoOverlay({ todo }: Props) {
-    const id = todo.id;
     const {ref, isDragSource} = useDraggable({
-      id,
+      id: todo.id,
     });
 
     const openModal = useModalStore((s) => s.open);
@@ -40,19 +34,19 @@ export default function TodoOverlay({ todo }: Props) {
     <motion.li 
         ref={ref}
         onClick={handleClick}
-        variants={containerVariants}
+        data-todo-id={todo.id}
         initial="rest"
-        whileHover="hover"
+        whileHover={todo.check ? undefined : "hover"}
         className={`
-            ${isDragSource && "border-2 border-brand-muted rotate-2 transform"}
+            ${isDragSource ? "opacity-30 scale-95" : ""}
             rounded-md w-full bg-gray-5 text-gray-1 p-2 px-4 cursor-pointer
            hover:bg-gray-4 relative flex items-center overflow-hidden list-none`}
     >
-        <CheckBox check={todo.check}/>
+        <CheckBox todoId={todo.id} checked={todo.check} cardId={todo.cardId} />
 
         <motion.span
         variants={textVariants}
-        className="font-medium w-[90%] wrap-break-word"
+        className={`font-medium w-[90%] wrap-break-word ${todo.check ? "pl-7" : ""}`}
         >
             {todo.title}
         </motion.span>

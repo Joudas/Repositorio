@@ -1,7 +1,15 @@
 import { motion } from "motion/react";
-import { useState } from "react";
-import { RiCheckboxBlankCircleLine } from "react-icons/ri";
-import { FaCheckCircle } from "react-icons/fa";
+import type { UseMutationResult } from "@tanstack/react-query";
+import type { Todo } from "@/type/Todo";
+import AnimationPresenceCheck from "./AnimationPresenceCheck";
+
+type Props = {
+  toggleMutation: UseMutationResult<Todo, Error, void, {
+      previous: Todo[] | undefined;
+  }>
+  check: boolean;
+};
+
 
 const checkboxVariants = {
   rest: {
@@ -17,21 +25,20 @@ const checkboxVariants = {
   },
 };
 
-export default function Checkbox({check}: {check: boolean}) {
-  const [checked, setChecked] = useState(check);
-  
+export default function Checkbox({ check, toggleMutation }: Props) {
+
+
+
   return (
     <motion.div
-      onClick={(e) => { e.stopPropagation(); setChecked(!checked); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleMutation.mutate();
+      }}
       variants={checkboxVariants}
       className="absolute left-2 flex items-center justify-center w-5 h-5 rounded-full"
       >
-        {
-            checked ? 
-            <FaCheckCircle color="#16DB00" className="w-full h-full" />
-            : 
-            <RiCheckboxBlankCircleLine className="w-full h-full" />
-        }
+        <AnimationPresenceCheck check={check} />
     </motion.div>
   );
 }

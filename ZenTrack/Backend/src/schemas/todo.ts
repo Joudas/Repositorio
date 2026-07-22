@@ -5,7 +5,7 @@ export const createTodoSchema = z.object({
   title: z
     .string({ message: "title es requerido" })
     .min(1, "title no puede estar vacío")
-    .max(100, "title demasiado largo"),
+    .max(500, "title demasiado largo"),
   description: z.string().optional(),
   energy: z.enum(["BAJA", "MEDIA", "ALTA"]).optional(),
   comments: z.string().optional(),

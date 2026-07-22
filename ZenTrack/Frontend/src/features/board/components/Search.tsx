@@ -56,7 +56,10 @@ export default function Search() {
         <div 
         ref={containerRef} 
         className="py-1 px-2 h-8 w-120 text-gray-4 border border-gray-4 flex gap-2 rounded-sm relative focus:border-gray-2 focus:text-gray-2">
-            <IoSearchOutline size="18"/>
+            <div className="flex justify-center items-center">
+                <IoSearchOutline size="18"/>
+
+            </div>
             <input
                 name="name"
                 autoComplete="off"
