@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBoardById } from "@/services/board";
 //components
-import Header from "./components/Header";
+import Header from "../../components/layout/Header";
 import InBox from "./components/InBox";
 import Main from "./components/Main";
 import InBoxBar from "./components/InBoxBar";
@@ -151,7 +151,7 @@ export default function BoardScreen() {
 
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden relative">
-      <Header />
+      <Header showCreateBoard={false} />
         <div className="flex flex-1 overflow-hidden">
           <DragDropProvider onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd}>
             {
