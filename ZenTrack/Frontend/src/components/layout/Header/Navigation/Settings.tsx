@@ -1,7 +1,8 @@
 import { useAuthStore } from '@/stores/authStore'
-import { useHandleClick } from '../hooks/useHandleClick';
+import { useHandleClick } from '../../../../features/board/hooks/useHandleClick';
 import { useRef } from 'react';
 import { logoutUser } from '@/services/auth';
+import { useNavigate } from 'react-router-dom';
 const settingsList = [
     {"title": "Switch Acount", "className": "py-2",   },
     {"title": "", "className": " self-center w-[90%] border-b h-0 border-gray-4 py-0 cursor-none hover:bg-gray-6 my-2",   },
@@ -15,13 +16,20 @@ const settingsList = [
 export default function Settings({setSettings}: {setSettings: React.Dispatch<React.SetStateAction<boolean>>}) {
     
     const user = useAuthStore((set) => set.user);
+
+    const navigate = useNavigate();
     
     const containerRef = useRef<HTMLDivElement>(null);
     const setClose = () => setSettings(false)
     useHandleClick(containerRef, setClose);
+
+    const handleLogOut = async () => {
+        await logoutUser();
+        navigate("/");
+    }
     
   return (
-    <div ref={containerRef} className='absolute w-100 min-h-40 bg-gray-6 top-10 -right-6 py-8 rounded-sm z-10'>
+    <div ref={containerRef} className='absolute w-100 min-h-40 bg-gray-6 top-10 -right-6 py-8 rounded-sm z-10 border-gray-5 border'>
         <p className='text-gray-4 text-sm font-bold px-6'>Acount</p>
         <ul className=' mt-4 text-gray-2 flex flex-col'>
             <li className="px-6 py-2">
@@ -35,7 +43,7 @@ export default function Settings({setSettings}: {setSettings: React.Dispatch<Rea
             {
                 settingsList.map((set) => (
                     <>
-                        <li className={`cursor-pointer px-6 hover:bg-gray-5 ${set.className}`}  onClick={set.title == "Log Out" ? logoutUser : () => {return}}>{set.title}</li>
+                        <li className={`cursor-pointer px-6 hover:bg-gray-5 ${set.className}`}  onClick={set.title == "Log Out" ? handleLogOut : () => {return}}>{set.title}</li>
                     </>
                 ))
             }

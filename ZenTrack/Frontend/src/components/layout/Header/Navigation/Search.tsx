@@ -2,7 +2,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { getBoardsList, type Board } from "@/services/board"
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useHandleClick } from "../hooks/useHandleClick";
+import { useHandleClick } from "../../../../features/board/hooks/useHandleClick";
 import { IoSearchOutline } from "react-icons/io5";
 
 export default function Search() {

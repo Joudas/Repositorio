@@ -12,19 +12,19 @@ router.post(
   requireAuth,
   validate(createBoardSchema),
   async (req: Request, res: Response): Promise<void> => {
-    const { name } = req.body as { name: string };
+    const { name, themeId } = req.body as { name: string, themeId: string };
     const userId = req.userId!;
 
     const existingBoard = await validateBoard(name, userId);
     if(existingBoard.length) {
-      res.status(201).json({
+      res.status(409).json({
         "response": "Dashboard already used"
       });
       return
     }
 
     const board = await prisma.board.create({
-      data: { name, userId },
+      data: { name, userId, themeId },
       select: { id: true, name: true, userId: true },
     });
 
@@ -41,7 +41,7 @@ router.get(
 
     const boards = await prisma.board.findMany({
       where: { userId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, themeId: true },
       orderBy: { name: "asc" },
     });
 
@@ -59,7 +59,7 @@ router.get(
 
     const board = await prisma.board.findFirst({
       where: { id, userId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, themeId: true },
     });
 
     if (!board) {
@@ -168,9 +168,38 @@ router.delete(
   }
 );
 
+router.put(
+  "/theme/:id",
+  requireAuth,
+  async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id);
+    const userId = req.userId!;
+    const { themeId } = req.body;
+
+    const existing = await prisma.board.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: "Board no encontrado" });
+      return;
+    }
+
+    const board = await prisma.board.update({ 
+      where: { id },
+      data: { themeId },
+      select: { id: true }, 
+    });
+    res.json(board);
+  }
+);
+
+
+
 const validateBoard = async (name: string, userId: string) => {
   const existingBoard = await prisma.board.findMany({
-      where: { name, userId},
+      where: { name, userId },
+      select: { id: true },
   });
   return existingBoard;
 }

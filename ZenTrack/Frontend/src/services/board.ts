@@ -3,10 +3,11 @@ import { api } from "./api"
 export type Board = {
   id: string;
   name: string;
+  themeId: string;
 };
 
-export const postBoard = async (name: string): Promise<Board> => {
-  return api.post<Board>("/api/board", { name });
+export const postBoard = async (name: string, themeId: string): Promise<Board> => {
+  return api.post<Board>("/api/board", { name, themeId });
 };
 
 export const getBoardById = async (id: string): Promise<Board> => {
@@ -23,4 +24,11 @@ export const deleteBoard = async (id: string, body: Board): Promise<Board> => {
 
 export const updateBoard = async (id: string): Promise<Board> => {
   return api.delete<Board>(`/api/board/${id}`);
+};
+
+export const getThemes = async (): Promise<Board> => {
+  return api.get<Board>(`/api/theme`);
+};
+export const getThemeById = async (id: string): Promise<Board> => {
+  return api.get<Board>(`/api/theme/${id}`);
 };

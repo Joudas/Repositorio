@@ -5,7 +5,7 @@ import { getInBox } from "@/services/card";
 import type { Board } from "@/services/board";
 
 import { getTodo } from "@/services/todo";
-import InBoxCard from "./InBoxCard";
+import InBoxCard from "../Card/InBoxCard";
 
 
 interface Props {

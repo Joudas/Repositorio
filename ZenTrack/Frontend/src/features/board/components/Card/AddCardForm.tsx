@@ -2,7 +2,7 @@ import { useRef, useState, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { FaPlus } from "react-icons/fa";
-import { useHandleClick } from "../hooks/useHandleClick";
+import { useHandleClick } from "../../hooks/useHandleClick";
 
 import { IoCloseSharp } from "react-icons/io5";
 import { Button } from "@/components/UI";

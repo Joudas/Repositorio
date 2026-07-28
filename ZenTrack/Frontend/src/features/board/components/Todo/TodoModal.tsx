@@ -3,11 +3,11 @@ import { createPortal } from "react-dom";
 import { useModalStore } from "@/stores/modalStore";
 
 import { Button } from "@/components/UI";
-import Comment from "./Comment";
+import Comment from "../Comment/Comment";
 
 // Icons
 import { MdOutlineDescription } from "react-icons/md";
-import AnimationPresenceCheck from "./AnimationPresenceCheck";
+import AnimationPresenceCheck from "../Checkbox/AnimationPresenceCheck";
 
 import type { Todo } from "@/type/Todo";
 import { deleteTodo, updateTodo } from "@/services/todo";

@@ -3,14 +3,13 @@ import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getBoardById } from "@/services/board";
 //components
-import Header from "../../components/layout/Header";
-import InBox from "./components/InBox";
-import Main from "./components/Main";
-import InBoxBar from "./components/InBoxBar";
+import Header from "../../components/layout/Header/Header";
+import { Main, InBox, InBoxBar } from "./components/Layout";
 import { DragDropProvider, DragOverlay } from "@dnd-kit/react";
 
 import type { Todo } from "@/type/Todo";
 import { moveTodo, reorderTodos } from "@/services/todo";
+import Spinner from "@/components/UI/Spinner";
 
 export default function BoardScreen() {
 
@@ -22,7 +21,7 @@ export default function BoardScreen() {
   const [activeTodo, setActiveTodo] = useState<Todo | null>(null);
   const [hoverPosition, setHoverPosition] = useState<{ cardId: string; index: number } | null>(null);
 
-  const { data: board } = useQuery({
+  const { data: board, isLoading, isError } = useQuery({
     queryKey: ["board", id],
     queryFn: () => getBoardById(id!),
     enabled: !!id,
@@ -148,6 +147,22 @@ export default function BoardScreen() {
       queryClient.setQueryData<Todo[]>(["todos", targetId], targetSnapshot);
     });
   }, [queryClient, hoverPosition]);
+
+  if (isLoading) return (
+    <div className="w-screen h-screen flex flex-col bg-gray-6">
+      <Header />
+      <Spinner />
+    </div>
+  );
+
+  if (isError) return (
+    <div className="w-screen h-screen flex flex-col bg-gray-6">
+      <Header />
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-gray-2 text-lg">Error loading boards. Try again later.</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden relative">
