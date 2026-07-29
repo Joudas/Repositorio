@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getBoardById, updateBoard, deleteBoard, updateBoardTheme } from "@/services/board";
+import { getBoardById, updateBoard, deleteBoard, updateBoardTheme, updateModeZenCard } from "@/services/board";
 //components
 import Header from "../../components/layout/Header/Header";
 import { Main, InBox, InBoxBar } from "./components/Layout";
