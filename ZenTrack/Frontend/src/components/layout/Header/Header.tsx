@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
 import { FormBoard, Search, Settings } from "./Navigation";
 
+import { IoMenu } from "react-icons/io5";
+
 interface HeaderProps {
   showCreateBoard?: boolean;
 }
@@ -49,7 +51,7 @@ export default function Header({ showCreateBoard = true }: HeaderProps) {
         </div>
         <div className="flex gap-4 text-gray-1 items-center relative">
             <div className='cursor-pointer' onClick={() => setSettings(!setting)}>
-                <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M17 12H7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><path d="M14 17H10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+                <IoMenu size="24" color="white"/>
             </div>
             
             {

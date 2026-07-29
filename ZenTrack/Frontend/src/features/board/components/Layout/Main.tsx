@@ -1,18 +1,26 @@
+import { useState, useCallback, useRef, useEffect } from "react";
 import { getThemeById } from "@/services/board";
 import Card from "../Card/Card";
 import { useQuery } from "@tanstack/react-query";
 import { getCardList } from "@/services/card";
-import { SlOptions } from "react-icons/sl";
 import AddCardForm from "../Card/AddCardForm";
 import type { Board } from "@/type/Board";
-
+import Header from "./Header";
 
 interface Props {
   board: Board;
   hoverPosition?: { cardId: string; index: number } | null;
+  zenMode?: boolean;
+  modeZenCard?: string;
+  onToggleZen?: () => void;
+  onModeZenCardChange?: (cardTitle: string) => void;
+  onRenameBoard: (name: string) => void;
+  onDeleteBoard: () => void;
+  onThemeChange: (themeId: string) => void;
 }
 
-export default function Main({ board, hoverPosition }: Props) {
+export default function Main({ board, hoverPosition, zenMode, modeZenCard, onToggleZen, onModeZenCardChange, onRenameBoard, onDeleteBoard, onThemeChange }: Props) {
+
 
   const {data: theme, isLoading} = useQuery({ 
     queryKey: ['theme', board?.id], 
@@ -25,27 +33,41 @@ export default function Main({ board, hoverPosition }: Props) {
     enabled: !!board,
   });
 
+  const bgStyle = (!isLoading && theme)
+    ? theme.mode === "COLOR" && theme.color_one && theme.color_two
+      ? { backgroundImage: `linear-gradient(to bottom right, ${theme.color_one}, ${theme.color_two})` }
+      : theme.mode === "IMAGE" && theme.image
+        ? { backgroundImage: `url(/${theme.image}.jpg)`, backgroundSize: "cover" as const, backgroundPosition: "center" as const }
+        : { backgroundImage: "url('/bg-zentrack.jpg')", backgroundSize: "cover" as const, backgroundPosition: "center" as const }
+    : { backgroundImage: "url('/bg-zentrack.jpg')", backgroundSize: "cover" as const, backgroundPosition: "center" as const };
+
   return (
-    <div className={`flex flex-1 flex-col gap-4 overflow-hidden bg-cover bg-center bg-no-repeat
-      ${ (!isLoading && theme) && theme.id ? "" : "bg-[url('/bg-zentrack.jpg')]" }
-      ${ theme && theme.mode == "COLOR" ? `bg-linear-to-r from-[${theme.color_one}] to-[${theme.color_two}]` : '' }
-      ${ theme && theme.mode == "IMAGE" ? `bg-[url('/img/hero.jpg')]` : ''  }
-    `}>
-      <div className="w-full h-14 relative">
-        <div className="w-full h-full bg-black opacity-50 absolute z-1"></div>
-        <div className="w-full h-full px-6 flex justify-between items-center">
-          <p className="text-gray-1 font-semibold text-xl z-2">{board?.name}</p>
-          <SlOptions size="28" className="cursor-pointer z-2 text-white hover:text-gray-3"/>
-        </div>
-      </div>
+    <div className="flex flex-1 flex-col gap-4 overflow-hidden" style={bgStyle}>
+      <Header 
+      board={board} 
+      zenMode={zenMode}
+      modeZenCard={modeZenCard} 
+      cards={cards} 
+      onToggleZen={onToggleZen}
+      onModeZenCardChange={onModeZenCardChange}
+      onRenameBoard={onRenameBoard} 
+      onDeleteBoard={onDeleteBoard} 
+      onThemeChange={onThemeChange} 
+      />
       <div className="p-4  py-2 flex gap-4">
         
         {
-          cards && cards?.map((card) => {
-            return <Card card={card} key={card.id} boardId={board!.id} hoverPosition={hoverPosition} />
-          })
+          zenMode && modeZenCard
+            ? cards
+                ?.filter((card) => card.title === modeZenCard)
+                .map((card) => (
+                  <Card card={card} key={card.id} boardId={board!.id} hoverPosition={hoverPosition} />
+                ))
+            : cards?.map((card) => {
+                return <Card card={card} key={card.id} boardId={board!.id} hoverPosition={hoverPosition} />
+              })
         }
-        {board && <AddCardForm boardId={board.id} />}
+        {!zenMode && board && <AddCardForm boardId={board.id} />}
 
       </div>
     </div>

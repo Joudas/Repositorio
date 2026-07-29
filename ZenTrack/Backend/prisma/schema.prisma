@@ -27,6 +27,8 @@ model Board {
   themeId   String?
   theme     Theme?  @relation(fields: [themeId], references: [id], onDelete: Cascade)
 
+  modeZenCard String @default("Doing")
+
   card  Card[]
 }
 

@@ -47,7 +47,7 @@ router.get(
     const themes = await prisma.theme.findMany({
       select: { id: true, mode: true, color_one: true, color_two: true, image: true },
     });
-    res.status(201).json(themes);
+    res.status(200).json(themes);
   }
 );
 
@@ -60,7 +60,7 @@ router.get(
       where: { id },
       select: { id: true, mode: true, color_one: true, color_two: true, image: true },
     });
-    res.status(201).json(theme);
+    res.status(200).json(theme);
   }
 );
 

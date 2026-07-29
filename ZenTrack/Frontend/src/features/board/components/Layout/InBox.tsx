@@ -52,6 +52,7 @@ export default function InBox({board, isBoard, hoverPosition} : Props) {
   const { data: todos } = useQuery({
     queryKey: ["todos", card?.id],
     queryFn: () => getTodo(card!.id),
+    enabled: !!card,
   });
 
   return (

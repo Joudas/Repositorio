@@ -107,9 +107,9 @@ POST http://localhost:3001/api/theme/
 content-type: application/json
 
 {
-    "name": "Orange",
-    "mode": "COLOR",
-    "color_one": "#F54927",
-    "color_two": "#A3311A",
-    "image": ""
+    "name": "MOUNTAIN",
+    "mode": "IMAGE",
+    "color_one": "",
+    "color_two": "",
+    "image": "bg-mountain"
 }

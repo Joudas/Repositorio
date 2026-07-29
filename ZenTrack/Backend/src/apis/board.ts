@@ -24,7 +24,12 @@ router.post(
     }
 
     const board = await prisma.board.create({
-      data: { name, userId, themeId },
+      data: {
+        name, userId, themeId,
+        card: {
+          create: { title: "InBox", position: 0 },
+        },
+      },
       select: { id: true, name: true, userId: true },
     });
 
@@ -41,7 +46,7 @@ router.get(
 
     const boards = await prisma.board.findMany({
       where: { userId },
-      select: { id: true, name: true, themeId: true },
+      select: { id: true, name: true, themeId: true, modeZenCard: true },
       orderBy: { name: "asc" },
     });
 
@@ -59,7 +64,7 @@ router.get(
 
     const board = await prisma.board.findFirst({
       where: { id, userId },
-      select: { id: true, name: true, themeId: true },
+      select: { id: true, name: true, themeId: true, modeZenCard: true },
     });
 
     if (!board) {
@@ -195,6 +200,34 @@ router.put(
 );
 
 
+
+// ─── PUT /:id/zen-card — Actualizar la card de enfoque Zen ─
+router.put(
+  "/:id/zen-card",
+  requireAuth,
+  async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id);
+    const userId = req.userId!;
+    const { modeZenCard } = req.body as { modeZenCard: string };
+
+    const existing = await prisma.board.findFirst({
+      where: { id, userId },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: "Board no encontrado" });
+      return;
+    }
+
+    const board = await prisma.board.update({
+      where: { id },
+      data: { modeZenCard },
+      select: { id: true, modeZenCard: true },
+    });
+
+    res.json(board);
+  }
+);
 
 const validateBoard = async (name: string, userId: string) => {
   const existingBoard = await prisma.board.findMany({
