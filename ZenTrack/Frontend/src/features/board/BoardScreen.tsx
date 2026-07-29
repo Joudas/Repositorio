@@ -199,7 +199,7 @@ export default function BoardScreen() {
     );
 
     const insertAt = hoverPosition?.cardId === targetId ? hoverPosition.index : -1;
-
+    
     if (sourceCardId === targetId) {
       // Same card — reorder with position
       const current = queryClient.getQueryData<Todo[]>(["todos", targetId]) || [];
