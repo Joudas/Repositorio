@@ -100,30 +100,20 @@ router.get(
     // Verificar ownership del board
     const board = await prisma.board.findFirst({
       where: { id: boardId, userId },
+      select: { id: true },
     });
     if (!board) {
       res.status(404).json({ error: "Board no encontrado" });
       return;
     }
 
-     const inBox = await prisma.card.findFirst({
-        where: { 
-          title: 'InBox',
-          boardId,
-        }
-      });
-
-      const inBoxId = inBox?.id;  
-
     const cards = await prisma.card.findMany({
       where: { 
         boardId,
-        id:{
-          not: inBoxId
-        }
+        title: { not: 'InBox' },
       },
       select: {
-        id: true, title: true,
+        id: true, title: true, position: true,
       },
       orderBy: { position: "asc" },
     });

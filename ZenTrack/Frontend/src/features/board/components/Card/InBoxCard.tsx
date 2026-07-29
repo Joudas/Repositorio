@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { Card } from "@/services/card";
-import TodoAdd from "./TodoAdd";
+import TodoAdd from "../Todo/TodoAdd";
 import { type Todo as TodoType } from "@/type/Todo"
 
-import Todo from "./Todo"
+import Todo from "../Todo/Todo"
 import {useDroppable} from '@dnd-kit/react';
 import React from "react";
 

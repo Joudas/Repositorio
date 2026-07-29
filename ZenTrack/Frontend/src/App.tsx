@@ -1,6 +1,6 @@
 import RouterEngine from "./components/RouterEngine";
 import { useModalStore } from "@/stores/modalStore";
-import TodoModal from "@/features/board/components/TodoModal";
+import { TodoModal } from "@/features/board/components/Todo";
 
 function App() {
   const todo = useModalStore((s) => s.todo);

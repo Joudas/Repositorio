@@ -10,12 +10,12 @@ import { type Card } from "@/services/card";
 import { deleteCard } from "@/services/card";
 import { getTodo } from "@/services/todo";
 
-import Todo from "./Todo";
-import TodoAdd from "./TodoAdd";
+import Todo from "../Todo/Todo";
+import TodoAdd from "../Todo/TodoAdd";
 
 // Dnd-kit
 import {useDroppable} from '@dnd-kit/react';
-import { useHandleClick } from "../hooks/useHandleClick";
+import { useHandleClick } from "../../hooks/useHandleClick";
 import React from "react";
 
 type Props = {
@@ -25,7 +25,6 @@ type Props = {
 }
 
 export default function Card({ card, boardId, hoverPosition }: Props) {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const containerRef = useRef<HTMLDivElement>(null);

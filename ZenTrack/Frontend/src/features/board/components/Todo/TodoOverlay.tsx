@@ -3,7 +3,7 @@ import type { Todo } from "@/type/Todo";
 
 import { useModalStore } from "@/stores/modalStore";
 
-import CheckBox from "./CheckBox";
+import CheckBox from "../Checkbox/CheckBox";
 
 import { useDraggable } from "@dnd-kit/react";
 

@@ -10,6 +10,7 @@ import Spinner from "@/components/UI/Spinner";
 import LoginScreen from "@/features/auth/login/LoginScreen";
 import RegisterScreen from "@/features/auth/register/RegisterScreen";
 import BoardScreen from "@/features/board/BoardScreen";
+import DashboardScreen from "@/features/dashboard/DashboardScreen";
 
 
 function AppWrapper({ children }: { children: React.ReactNode }) {
@@ -41,12 +42,7 @@ export default function RouterEngine() {
             {/* Protected routes — only when authenticated */}
             <Route element={<ProtectedRoute />}>
               <Route path="/board/:id" element={<BoardScreen />} />
-              <Route
-                path="/"
-                element={
-                  <div className="p-8 text-2xl font-bold">ZenTrack — Home</div>
-                }
-              />
+              <Route path="/" element={<DashboardScreen />} />
             </Route>
 
             {/* Catch-all */}

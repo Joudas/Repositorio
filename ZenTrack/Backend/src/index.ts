@@ -1,20 +1,28 @@
 import "dotenv/config";
 import express, { type Express, type Request, type Response } from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import { prisma } from "./utils/db.js";
+
+import cors from "cors";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import cookieParser from "cookie-parser";
 import userRouter from "./apis/user.js";
 import authRouter from "./apis/auth.js";
 import boardRouter from "./apis/board.js";
 import cardRouter from "./apis/card.js";
 import todoRouter from "./apis/todo.js";
 import commentRouter from "./apis/comment.js";
+import themeRouter from "./apis/theme.js";
 
 const app: Express = express();
 const PORT = process.env["PORT"] ?? 3001;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ─── Middleware global ─────────────────────────────────────
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use(cookieParser());
 app.use(cors({
   origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -48,6 +56,7 @@ app.use("/api/board/card/todo/comment", commentRouter);
 app.use("/api/board/card/todo", todoRouter);
 app.use("/api/board/card", cardRouter);
 app.use("/api/board", boardRouter);
+app.use("/api/theme", themeRouter);
 
 // ─── Inicio del servidor ──────────────────────────────────
 
