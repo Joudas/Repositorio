@@ -1,30 +1,110 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
 
-export async function GET() {
+// Proyección ampliada para caja: order_number, waiter_id, users(name),
+// cancel_reason y payment_methods(name) además del anidado de items.
+const ORDERS_SELECT = `
+  id,
+  order_number,
+  order_type,
+  status,
+  table_number,
+  total_amount,
+  observation,
+  waiter_id,
+  cancel_reason,
+  created_at,
+  users (name),
+  payment_methods (name),
+  order_items (
+    id,
+    quantity,
+    unit_price,
+    products (id, name, ingredients, image)
+  )
+`
+
+// Escapa el término de búsqueda para usarlo dentro del filtro `.or()` de
+// PostgREST: duplica comillas simples (sintaxis de string literal SQL) y
+// escapa los comodines de ILIKE para que % y _ se traten como texto literal.
+function sanitizeSearchTerm(term: string): string {
+  return term.replace(/'/g, "''").replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+
+export async function GET(req: NextRequest) {
   const supabase = createClient(await cookies())
 
-  const { data, error } = await supabase
-    .from('orders')
-    .select(
-      `
-      id,
-      order_type,
-      status,
-      table_number,
-      total_amount,
-      created_at,
-      order_items (
-        id,
-        quantity,
-        unit_price,
-        products (id, name, ingredients)
+  // scope=active (default, no rompe la cocina) | scope=history (hoy)
+  const scope = req.nextUrl.searchParams.get('scope') ?? 'active'
+
+  let query = supabase.from('orders').select(ORDERS_SELECT)
+
+  if (scope === 'history') {
+    // Historial = ventas PAID + anulaciones CANCELED.
+    // - PAID se filtra por paid_at (cuándo se vendió realmente).
+    // - CANCELED nunca se pagó (paid_at NULL) → se filtra por created_at
+    //   (cuándo se anuló). Sin este tratamiento, las anulaciones quedarían
+    //   siempre fuera del historial.
+    // Se ejecutan dos queries en paralelo y se combinan en el servidor;
+    // un filtro `.or()` compuesto con timestamps ISO es frágil en PostgREST.
+    const searchParams = req.nextUrl.searchParams
+    const from = searchParams.get('from') // YYYY-MM-DD
+    const to = searchParams.get('to') // YYYY-MM-DD
+    const q = searchParams.get('q')?.trim()
+
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    const fromIso = from
+      ? new Date(`${from}T00:00:00`).toISOString()
+      : startOfToday.toISOString()
+    const toIso = to ? new Date(`${to}T23:59:59.999`).toISOString() : null
+
+    const buildHistoryQuery = (status: 'PAID' | 'CANCELED', dateColumn: 'paid_at' | 'created_at') => {
+      let qry = supabase
+        .from('orders')
+        .select(ORDERS_SELECT)
+        .eq('status', status)
+        .gte(dateColumn, fromIso)
+        .order('created_at', { ascending: false })
+
+      if (toIso) qry = qry.lte(dateColumn, toIso)
+
+      if (q) {
+        const term = sanitizeSearchTerm(q)
+        qry = qry.or(
+          `order_number::text.ilike.%${term}%, users.name.ilike.%${term}%`,
+        )
+      }
+
+      return qry
+    }
+
+    const paidQuery = buildHistoryQuery('PAID', 'paid_at')
+    const canceledQuery = buildHistoryQuery('CANCELED', 'created_at')
+
+    const [paidResult, canceledResult] = await Promise.all([paidQuery, canceledQuery])
+
+    const error = paidResult.error ?? canceledResult.error
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Combina ambas listas y ordena por fecha desc (más reciente primero).
+    const data = [...(paidResult.data ?? []), ...(canceledResult.data ?? [])]
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       )
-    `,
-    )
-    .in('status', ['PENDING', 'READY'])
-    .order('created_at', { ascending: true })
+
+    return NextResponse.json({ orders: data })
+  } else {
+    query = query
+      .in('status', ['PENDING', 'READY'])
+      .order('created_at', { ascending: true })
+  }
+
+  const { data, error } = await query
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

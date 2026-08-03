@@ -8,12 +8,12 @@ export const useOrder = () => {
     const [error, setError] = useState<string | null>(null);
 
     const submitOrder = useCallback(
-        async (items: CartItem[], orderType: 'TAKEAWAY' | 'DINE_IN' = 'TAKEAWAY'): Promise<boolean> => {
+        async (items: CartItem[], observation: string, orderType: 'TAKEAWAY' | 'DINE_IN' = 'TAKEAWAY'): Promise<boolean> => {
         setIsLoading(true);
         setError(null)
         try{
             const totalAmount = items.reduce((acc, i) => acc + i.price * i.quantity, 0);
-            await createOrder({orderType, items, totalAmount});
+            await createOrder({orderType, items, totalAmount, observation});
             return true;
         }catch(err){
             console.error('Error al crear la orden:', err)

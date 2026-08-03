@@ -17,12 +17,16 @@ export function CartDrawer({ open, onClose }: Props) {
 
   const {submitOrder, isLoading} = useOrder();
   
+  const [notes, setNotes] = useState("");
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({})
 
   // Close on Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape'){
+        onClose();
+        setNotes("");
+      }
     }
     if (open) document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
@@ -40,7 +44,7 @@ export function CartDrawer({ open, onClose }: Props) {
 
   const handleSubmit = async () => {
     // Esto se envia por parte de los clientes
-    const ok = await submitOrder(items)
+    const ok = await submitOrder(items, notes)
     if (ok) {
       clearCart()
       onClose()
@@ -194,7 +198,25 @@ export function CartDrawer({ open, onClose }: Props) {
                 </div>
               </div>
             )}
-            <button
+
+            <div className="mb-2 px-6">
+              <label 
+                htmlFor="order-notes" 
+                className="block text-xs font-semibold text-amber-950 mb-1.5 flex items-center gap-1.5"
+              >
+                <span>📝</span> Observaciones / Notas para la cocina
+              </label>
+              
+              <textarea
+                id="order-notes"
+                rows={2}
+                placeholder="Ej. Servilletas extra, separar salsas, alérgico a..."
+                className="w-full text-xs text-amber-950 placeholder:text-stone-400 bg-amber-50/50 border border-amber-200/80 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all resize-none"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div> 
+                       <button
               disabled={isLoading}
               onClick={() => handleSubmit()}
               className="mb-6 w-[90%] self-center h-10 flex items-center justify-center rounded-lg bg-rose-500 text-white hover:bg-rose-600 transition-colors"

@@ -28,4 +28,5 @@ export interface CreateOrderInput {
   orderType: 'TAKEAWAY' | 'DINE_IN';
   items: CartItem[];
   totalAmount: number;
+  observation: string;
 }

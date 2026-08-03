@@ -17,7 +17,7 @@ export default function HomePage() {
           Ver Menú
         </Link>
         <Link
-          href="/cocina"
+          href="/kitchen"
           className="inline-flex items-center gap-2 border border-amber-200 bg-white/60 text-amber-950 font-sans font-semibold px-6 py-3 rounded-full transition-all duration-200 hover:scale-105 hover:shadow-md"
         >
           Cocina

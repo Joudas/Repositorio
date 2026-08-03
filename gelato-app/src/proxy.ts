@@ -31,7 +31,9 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Protected routes — redirect to login if not authenticated
-  const protectedPaths = ['/pos', '/caja', '/dashboard']
+  // Nota: /caja es público temporalmente (como /kitchen). Se restaura
+  // en esta lista y en el matcher cuando exista login.
+  const protectedPaths = ['/pos', '/dashboard']
   const isProtected = protectedPaths.some((path) =>
     pathname.startsWith(path),
   )
@@ -52,9 +54,7 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith('/pos') && role !== 'WAITER' && role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    if (pathname.startsWith('/caja') && role !== 'CASHIER' && role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
+    // /caja: acceso público temporal — sin RBAC hasta que exista login.
     if (pathname.startsWith('/dashboard') && role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
@@ -64,5 +64,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/pos/:path*', '/caja/:path*', '/dashboard/:path*', '/login'],
+  // /caja fuera del matcher: acceso público temporal (se restaura con login)
+  matcher: ['/pos/:path*', '/dashboard/:path*', '/login'],
 }

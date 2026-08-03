@@ -1,6 +1,7 @@
 'use client'
 
-import { LayoutGroup, MotionConfig, motion } from 'framer-motion'
+import { useState } from 'react'
+import { LayoutGroup, MotionConfig } from 'framer-motion'
 import { CheckCircle2, Clock } from 'lucide-react'
 import { useKitchenOrders } from '../hooks/useKitchenOrders'
 import { useMarkReady } from '../hooks/useMarkReady'
@@ -87,6 +88,73 @@ function Column({
   )
 }
 
+type MobileTab = 'pending' | 'ready'
+
+function MobileTabs({
+  activeTab,
+  pendingCount,
+  readyCount,
+  onChange,
+}: {
+  activeTab: MobileTab
+  pendingCount: number
+  readyCount: number
+  onChange: (tab: MobileTab) => void
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Pedidos de cocina"
+      className="sticky top-0 z-10 grid grid-cols-2 gap-2 bg-cream/95 py-2 backdrop-blur-sm md:hidden"
+    >
+      <button
+        type="button"
+        role="tab"
+        aria-selected={activeTab === 'pending'}
+        onClick={() => onChange('pending')}
+        className={`flex h-11 items-center justify-center gap-2 rounded-xl px-3 font-sans text-sm font-bold transition-colors ${
+          activeTab === 'pending'
+            ? 'bg-amber-100 text-amber-900 shadow-sm'
+            : 'border border-stone-200 bg-white text-stone-400'
+        }`}
+      >
+        En espera
+        <span
+          className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 font-sans text-xs font-bold tabular-nums ${
+            activeTab === 'pending'
+              ? 'bg-white/80 text-amber-900'
+              : 'bg-stone-100 text-stone-500'
+          }`}
+        >
+          {pendingCount}
+        </span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={activeTab === 'ready'}
+        onClick={() => onChange('ready')}
+        className={`flex h-11 items-center justify-center gap-2 rounded-xl px-3 font-sans text-sm font-bold transition-colors ${
+          activeTab === 'ready'
+            ? 'bg-emerald-100 text-emerald-800 shadow-sm'
+            : 'border border-stone-200 bg-white text-stone-400'
+        }`}
+      >
+        Listos
+        <span
+          className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 font-sans text-xs font-bold tabular-nums ${
+            activeTab === 'ready'
+              ? 'bg-white/80 text-emerald-800'
+              : 'bg-stone-100 text-stone-500'
+          }`}
+        >
+          {readyCount}
+        </span>
+      </button>
+    </div>
+  )
+}
+
 export function KitchenBoard() {
   const {
     data: orders = [],
@@ -96,6 +164,7 @@ export function KitchenBoard() {
     isSuccess,
   } = useKitchenOrders()
   const markReady = useMarkReady()
+  const [mobileTab, setMobileTab] = useState<MobileTab>('pending')
 
   const pending = orders.filter((o) => o.status === 'PENDING')
   const ready = orders.filter((o) => o.status === 'READY')
@@ -111,6 +180,13 @@ export function KitchenBoard() {
           isSuccess={isSuccess}
         />
 
+        <MobileTabs
+          activeTab={mobileTab}
+          pendingCount={pending.length}
+          readyCount={ready.length}
+          onChange={setMobileTab}
+        />
+
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 md:items-start">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -120,24 +196,28 @@ export function KitchenBoard() {
         ) : (
           <LayoutGroup>
             <div className="grid gap-8 md:grid-cols-2 md:items-start md:gap-6">
-              <Column
-                title="En espera"
-                tone="amber"
-                orders={pending}
-                emptyIcon={Clock}
-                emptyLabel="No hay pedidos en espera"
-                markingId={markingId}
-                onMarkReady={markReady.mutate}
-              />
-              <Column
-                title="Listos"
-                tone="emerald"
-                orders={ready}
-                emptyIcon={CheckCircle2}
-                emptyLabel="No hay pedidos listos"
-                markingId={markingId}
-                onMarkReady={markReady.mutate}
-              />
+              <div className={mobileTab === 'pending' ? '' : 'hidden md:block'}>
+                <Column
+                  title="En espera"
+                  tone="amber"
+                  orders={pending}
+                  emptyIcon={Clock}
+                  emptyLabel="No hay pedidos en espera"
+                  markingId={markingId}
+                  onMarkReady={markReady.mutate}
+                />
+              </div>
+              <div className={mobileTab === 'ready' ? '' : 'hidden md:block'}>
+                <Column
+                  title="Listos"
+                  tone="emerald"
+                  orders={ready}
+                  emptyIcon={CheckCircle2}
+                  emptyLabel="No hay pedidos listos"
+                  markingId={markingId}
+                  onMarkReady={markReady.mutate}
+                />
+              </div>
             </div>
           </LayoutGroup>
         )}

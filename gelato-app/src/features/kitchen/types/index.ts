@@ -6,6 +6,7 @@ export type KitchenOrderItem = {
     id: string
     name: string
     ingredients: string | null
+    image: string | null
   }
 }
 
@@ -15,6 +16,7 @@ export type KitchenOrder = {
   status: 'PENDING' | 'READY'
   table_number: number | null
   total_amount: number
+  observation: string | null
   created_at: string
   order_items: KitchenOrderItem[]
 }
