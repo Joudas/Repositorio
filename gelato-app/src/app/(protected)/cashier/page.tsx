@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { CashierClient } from './CashierClient'
 
 export const metadata: Metadata = {
-  title: 'Caja · Punto Glaceal',
+  title: 'Caja · Punto Glacial',
 }
 
 export default function CajaPage() {

@@ -6,7 +6,7 @@ import { getOrders } from '../api/getOrders'
 export function useActiveOrders() {
   return useQuery({
     queryKey: ['cashier-orders'],
-    queryFn: () => getOrders('active'),
+    queryFn: () => getOrders('active', undefined, 'cashier'),
     refetchInterval: 5000, // polling 5 s (mismo patrón que la cocina)
   })
 }

@@ -7,7 +7,7 @@ export function useKitchenOrders() {
   return useQuery({
     queryKey: ['kitchen-orders'],
     queryFn: async () => {
-      const res = await fetch('/api/orders')
+      const res = await fetch('/api/orders?view=kitchen')
       if (!res.ok) throw new Error('Error cargando pedidos')
       const data = await res.json()
       return data.orders as KitchenOrder[]

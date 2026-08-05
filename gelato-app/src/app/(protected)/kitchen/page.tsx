@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { KitchenClient } from './KitchenClient'
 
 export const metadata: Metadata = {
-  title: 'Cocina · Punto Glaceal',
+  title: 'Cocina · Punto Glacial',
 }
 
 export default function CocinaPage() {

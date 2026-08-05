@@ -15,7 +15,7 @@ export function useConfirmPayment() {
   return useMutation({
     mutationFn: ({ orderId, paymentMethodId, paymentReference }: ConfirmPaymentInput) =>
       updateOrder(orderId, {
-        status: 'PAID',
+        paymentStatus: 'PAID',
         paymentMethodId,
         paymentReference,
       }),

@@ -166,8 +166,10 @@ export function KitchenBoard() {
   const markReady = useMarkReady()
   const [mobileTab, setMobileTab] = useState<MobileTab>('pending')
 
-  const pending = orders.filter((o) => o.status === 'PENDING')
-  const ready = orders.filter((o) => o.status === 'READY')
+  // La cocina filtra por kitchen_status (IN_PREPARATION cae en "En espera");
+  // payment_status NO afecta: pagar no saca el pedido de la cocina.
+  const pending = orders.filter((o) => o.kitchen_status !== 'READY')
+  const ready = orders.filter((o) => o.kitchen_status === 'READY')
   const markingId = markReady.isPending ? markReady.variables : null
 
   return (

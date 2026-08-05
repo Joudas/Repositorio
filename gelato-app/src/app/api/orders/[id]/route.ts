@@ -4,7 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { z } from 'zod'
 
 const patchSchema = z.object({
-  status: z.enum(['PAID', 'CANCELED', 'READY']),
+  kitchen_status: z.enum(['READY']).optional(),
+  payment_status: z.enum(['PAID', 'CANCELED']).optional(),
   payment_method_id: z.uuid().optional(),
   payment_reference: z.string().optional(),
   cancel_reason: z.string().optional(),
@@ -22,14 +23,15 @@ export async function PATCH(
     return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 })
   }
 
-  const { status, payment_method_id, payment_reference, cancel_reason } = parsed.data
+  const { kitchen_status, payment_status, payment_method_id, payment_reference, cancel_reason } =
+    parsed.data
 
   const supabase = createClient(await cookies())
 
   // 1. Leer el estado actual para validar la transición legal
   const { data: current, error: readError } = await supabase
     .from('orders')
-    .select('id, status')
+    .select('id, kitchen_status, payment_status')
     .eq('id', id)
     .maybeSingle()
 
@@ -40,13 +42,14 @@ export async function PATCH(
     return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 })
   }
 
-  // 2. Validar transiciones
-  if (status === 'READY' && current.status !== 'PENDING') {
+  // 2. Validar transiciones — kitchen_status y payment_status son INDEPENDIENTES:
+  //    pagar un pedido no afecta el ciclo de cocina y viceversa.
+  if (kitchen_status === 'READY' && current.kitchen_status !== 'PENDING' && current.kitchen_status !== 'IN_PREPARATION') {
     return NextResponse.json({ error: 'Transición inválida' }, { status: 400 })
   }
 
-  if (status === 'PAID') {
-    if (current.status !== 'PENDING' && current.status !== 'READY') {
+  if (payment_status === 'PAID') {
+    if (current.payment_status !== 'UNPAID') {
       return NextResponse.json({ error: 'Transición inválida' }, { status: 400 })
     }
     if (!payment_method_id) {
@@ -70,8 +73,8 @@ export async function PATCH(
     }
   }
 
-  if (status === 'CANCELED') {
-    if (!['PENDING', 'READY', 'PAID'].includes(current.status)) {
+  if (payment_status === 'CANCELED') {
+    if (current.payment_status !== 'UNPAID' && current.payment_status !== 'PAID') {
       return NextResponse.json({ error: 'Transición inválida' }, { status: 400 })
     }
     if (!cancel_reason || cancel_reason.trim().length < 3) {
@@ -79,17 +82,19 @@ export async function PATCH(
     }
   }
 
-  // 3. Actualizar (sin tocar created_at)
-  const updateData: Record<string, unknown> = { status }
-  if (status === 'PAID') {
+  // 3. Actualizar (sin tocar created_at; paid_at lo setea el trigger
+  //    trg_orders_set_paid_at cuando payment_status pasa a 'PAID').
+  const updateData: Record<string, unknown> = {}
+  if (kitchen_status) updateData.kitchen_status = kitchen_status
+  if (payment_status === 'PAID') {
+    updateData.payment_status = payment_status
     updateData.payment_method_id = payment_method_id
     if (payment_reference?.trim()) {
       updateData.payment_reference = payment_reference.trim()
     }
-    // Marca el momento real de la venta; el historial filtra por paid_at
-    updateData.paid_at = new Date().toISOString()
   }
-  if (status === 'CANCELED') {
+  if (payment_status === 'CANCELED') {
+    updateData.payment_status = payment_status
     updateData.cancel_reason = cancel_reason!.trim()
   }
 

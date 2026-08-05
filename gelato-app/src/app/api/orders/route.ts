@@ -4,17 +4,20 @@ import { createClient } from '@/utils/supabase/server'
 
 // Proyección ampliada para caja: order_number, waiter_id, users(name),
 // cancel_reason y payment_methods(name) además del anidado de items.
+// `status` ya no existe en la DB (spliteado en kitchen_status + payment_status).
 const ORDERS_SELECT = `
   id,
   order_number,
   order_type,
-  status,
+  kitchen_status,
+  payment_status,
   table_number,
   total_amount,
   observation,
   waiter_id,
   cancel_reason,
   created_at,
+  paid_at,
   users (name),
   payment_methods (name),
   order_items (
@@ -37,15 +40,17 @@ export async function GET(req: NextRequest) {
 
   // scope=active (default, no rompe la cocina) | scope=history (hoy)
   const scope = req.nextUrl.searchParams.get('scope') ?? 'active'
+  // view=kitchen | view=cashier — qué necesita cada pantalla en el scope activo
+  const view = req.nextUrl.searchParams.get('view') ?? 'cashier'
 
   let query = supabase.from('orders').select(ORDERS_SELECT)
 
   if (scope === 'history') {
     // Historial = ventas PAID + anulaciones CANCELED.
-    // - PAID se filtra por paid_at (cuándo se vendió realmente).
-    // - CANCELED nunca se pagó (paid_at NULL) → se filtra por created_at
-    //   (cuándo se anuló). Sin este tratamiento, las anulaciones quedarían
-    //   siempre fuera del historial.
+    // - PAID se filtra por paid_at (cuándo se vendió realmente; lo setea el
+    //   trigger trg_orders_set_paid_at al pasar payment_status a PAID).
+    // - CANCELED se filtra por created_at (cuándo se anuló; puede tener
+    //   paid_at si se anuló un pedido ya cobrado).
     // Se ejecutan dos queries en paralelo y se combinan en el servidor;
     // un filtro `.or()` compuesto con timestamps ISO es frágil en PostgREST.
     const searchParams = req.nextUrl.searchParams
@@ -60,11 +65,11 @@ export async function GET(req: NextRequest) {
       : startOfToday.toISOString()
     const toIso = to ? new Date(`${to}T23:59:59.999`).toISOString() : null
 
-    const buildHistoryQuery = (status: 'PAID' | 'CANCELED', dateColumn: 'paid_at' | 'created_at') => {
+    const buildHistoryQuery = (paymentStatus: 'PAID' | 'CANCELED', dateColumn: 'paid_at' | 'created_at') => {
       let qry = supabase
         .from('orders')
         .select(ORDERS_SELECT)
-        .eq('status', status)
+        .eq('payment_status', paymentStatus)
         .gte(dateColumn, fromIso)
         .order('created_at', { ascending: false })
 
@@ -98,9 +103,17 @@ export async function GET(req: NextRequest) {
       )
 
     return NextResponse.json({ orders: data })
-  } else {
+  } else if (view === 'kitchen') {
+    // Cocina: todo lo que hay que preparar/entregar. PAGAR NO LO SACA:
+    // payment_status puede ser UNPAID o PAID; solo se oculta lo CANCELED.
     query = query
-      .in('status', ['PENDING', 'READY'])
+      .in('kitchen_status', ['PENDING', 'IN_PREPARATION', 'READY'])
+      .neq('payment_status', 'CANCELED')
+      .order('created_at', { ascending: true })
+  } else {
+    // Caja — Por Cobrar: solo lo que sigue impago.
+    query = query
+      .eq('payment_status', 'UNPAID')
       .order('created_at', { ascending: true })
   }
 

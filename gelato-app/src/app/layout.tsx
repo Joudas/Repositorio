@@ -17,8 +17,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Punto Glaceal — Heladería & Dulcería',
-  description: 'Menú digital de Punto Glaceal. Helados artesanales, milkshakes y más.',
+  title: 'Punto Glacial — Heladería & Dulcería',
+  description: 'Menú digital de Punto Glacial. Helados artesanales, milkshakes y más.',
 }
 
 export default function RootLayout({

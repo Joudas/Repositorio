@@ -13,7 +13,7 @@ export function useCancelOrder() {
 
   return useMutation({
     mutationFn: ({ orderId, cancelReason }: CancelOrderInput) =>
-      updateOrder(orderId, { status: 'CANCELED', cancelReason }),
+      updateOrder(orderId, { paymentStatus: 'CANCELED', cancelReason }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cashier-orders'] })
     },

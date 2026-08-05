@@ -6,11 +6,11 @@ import {
   Bike,
   Check,
   Loader2,
-  Table2,
   TimerOff,
   UtensilsCrossed,
 } from 'lucide-react'
 import Image from 'next/image'
+import { getOrderIdentity } from '@/features/orders'
 import type { KitchenOrder, KitchenOrderItem } from '../types'
 
 type Props = {
@@ -117,7 +117,8 @@ function OrderItemRow({ item }: OrderItemRowProps) {
 
 export function OrderCard({ order, onMarkReady, mutating }: Props) {
   const isTakeaway = order.order_type === 'TAKEAWAY'
-  const isReady = order.status === 'READY'
+  const identity = getOrderIdentity(order)
+  const isReady = order.kitchen_status === 'READY'
   const isDelayed = !isReady && elapsedMinutes(order.created_at) > DELAY_THRESHOLD_MINUTES
   const observation = order.observation?.trim()
 
@@ -135,24 +136,23 @@ export function OrderCard({ order, onMarkReady, mutating }: Props) {
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className={`rounded-2xl border shadow-sm p-3.5 ${cardTone}`}
     >
-      {/* Badge tipo + hora */}
+      {/* Badge tipo + identificador + hora */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
           {isTakeaway ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-400 px-3 py-1.5 text-xs font-bold text-amber-950">
               <Bike className="h-4 w-4" aria-hidden />
-              Para Llevar
+              Para Llevar · {identity.primary}
             </span>
           ) : (
             <>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500 px-3 py-1.5 text-xs font-bold text-white">
                 <UtensilsCrossed className="h-4 w-4" aria-hidden />
-                En Mesa
+                {identity.primary}
               </span>
-              {order.table_number !== null && (
+              {identity.secondary && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-500 px-3 py-1.5 text-xs font-bold text-white">
-                  <Table2 className="h-4 w-4" aria-hidden />
-                  Mesa {order.table_number}
+                  {identity.secondary}
                 </span>
               )}
             </>

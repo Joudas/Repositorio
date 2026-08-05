@@ -9,7 +9,7 @@ export function useMarkReady() {
       const res = await fetch(`/api/orders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'READY' }),
+        body: JSON.stringify({ kitchen_status: 'READY' }),
       })
       if (!res.ok) throw new Error('Error actualizando pedido')
     },

@@ -6,57 +6,106 @@ export async function proxy(request: NextRequest) {
     request: { headers: request.headers },
   })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          )
-          response = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          )
-        },
+  // Usar la clave anónima o publishable de forma segura
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll()
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        )
+        response = NextResponse.next({ request })
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options),
+        )
       },
     },
-  )
+  })
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // Obtenemos el usuario autenticado desde las cookies de sesión
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
 
-  // Protected routes — redirect to login if not authenticated
-  // Nota: /caja es público temporalmente (como /kitchen). Se restaura
-  // en esta lista y en el matcher cuando exista login.
-  const protectedPaths = ['/pos', '/dashboard']
-  const isProtected = protectedPaths.some((path) =>
-    pathname.startsWith(path),
-  )
+  // Comprobar si la ruta actual es protegida
+  const protectedPaths = ['/waiter', '/cashier', '/dashboard', '/kitchen']
+  const isProtected = protectedPaths.some((path) => pathname.startsWith(path))
 
+  // 1. Si intenta entrar a una ruta protegida y NO está logueado -> Redirigir a /login
   if (isProtected && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Login page — redirect to dashboard if already authenticated
-  if (pathname.startsWith('/login') && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Extraer el rol (Revisa user_metadata o app_metadata)
+  let role = (user?.user_metadata?.role || user?.app_metadata?.role) as
+    | string
+    | undefined
+
+  if (!role && user) {
+    const { data: dbUser } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+      
+    role = dbUser?.role
   }
 
-  // Role-based access control
-  if (user && isProtected) {
-    const role = user.user_metadata?.role as string | undefined
+  // 2. Si ya está logueado e intenta entrar a /login -> Redirigir según su rol
+  if (pathname.startsWith('/login') && user) {
+    const home =
+      role === 'CASHIER'
+        ? '/cashier'
+        : role === 'ADMIN'
+        ? '/dashboard'
+        : role === 'WAITER'
+        ? '/waiter'
+        : role === 'KITCHEN'
+        ? '/kitchen'
+        : '/'
 
-    if (pathname.startsWith('/pos') && role !== 'WAITER' && role !== 'ADMIN') {
+    return NextResponse.redirect(new URL(home, request.url))
+  }
+
+  // 3. Control de acceso basado en roles para rutas protegidas
+  if (user && isProtected) {    // Si el usuario no tiene rol asignado en la metadata aún, evitamos bloquearlo al login
+    // o asegúrate de asignárselo en Supabase Auth metadata.
+    if (!role) {
+      console.warn(`[Auth Middleware] Usuario ${user.id} no tiene rol asignado en metadata.`)
+      // Puedes redirigirlo a una página por defecto o a login si exige rol
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    // /caja: acceso público temporal — sin RBAC hasta que exista login.
+
+    if (pathname.startsWith('/waiter') && role !== 'WAITER' && role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    if (pathname.startsWith('/cashier') && role !== 'CASHIER' && role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    if (pathname.startsWith('/kitchen') && role !== 'KITCHEN' && role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
     if (pathname.startsWith('/dashboard') && role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  // 4. /delivery es público para clientes sin sesión (autopédido), pero
+  //    CASHIER y KITCHEN no pueden entrar logueados → redirect a su home.
+  if (user && pathname.startsWith('/delivery')) {
+    if (role === 'CASHIER') {
+      return NextResponse.redirect(new URL('/cashier', request.url))
+    }
+    if (role === 'KITCHEN') {
+      return NextResponse.redirect(new URL('/kitchen', request.url))
     }
   }
 
@@ -64,6 +113,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // /caja fuera del matcher: acceso público temporal (se restaura con login)
-  matcher: ['/pos/:path*', '/dashboard/:path*', '/login'],
+  matcher: [
+    '/waiter/:path*',
+    '/cashier/:path*',
+    '/kitchen/:path*',
+    '/dashboard/:path*',
+    '/delivery',
+    '/login',
+  ],
 }

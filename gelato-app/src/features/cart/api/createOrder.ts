@@ -11,7 +11,7 @@ export const createOrder = async (data: CreateOrderInput) => {
     .from('orders')
     .insert({
       order_type: data.orderType,
-      status: 'PENDING',
+      // kitchen_status y payment_status los setea la DB (defaults UNPAID/PENDING)
       total_amount: data.totalAmount,
       observation: data.observation,
     })

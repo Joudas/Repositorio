@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { generarFactura } from '../api/generarFactura'
 import { useCancelOrder } from '../hooks/useCancelOrder'
 import { useConfirmPayment } from '../hooks/useConfirmPayment'
+import { getOrderIdentity } from '@/features/orders'
 import type { CashierOrder, PaymentMethod } from '../types'
 import { CancelOrderModal } from './CancelOrderModal'
 import { PaymentMethodSelect } from './PaymentMethodSelect'
@@ -62,7 +63,8 @@ function DetailCard({ order, methods, onClearSelection, showClose }: DetailCardP
   const selectedMethod = methods.find((m) => m.id === effectiveMethodId)
   const isCash = selectedMethod?.name.toLowerCase() === 'efectivo'
 
-  const isReady = order.status === 'READY'
+  const isReady = order.kitchen_status === 'READY'
+  const identity = getOrderIdentity(order)
   // El bloque de recibido/cambio es exclusivo de Efectivo; la referencia solo aplica a otros métodos.
   const needsReference = !isCash && (selectedMethod?.requires_reference ?? false)
 
@@ -75,9 +77,7 @@ function DetailCard({ order, methods, onClearSelection, showClose }: DetailCardP
   const orderTypeLabel =
     order.order_type === 'TAKEAWAY'
       ? 'Para Llevar'
-      : order.table_number !== null
-        ? `Mesa ${order.table_number}`
-        : 'En Mesa'
+      : 'En Mesa' // la mesa específica ya está en el identificador primario
 
   const handleConfirm = () => {
     const change = isCash && !isInsufficient ? receivedAmount - order.total_amount : undefined
@@ -131,8 +131,13 @@ function DetailCard({ order, methods, onClearSelection, showClose }: DetailCardP
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-outfit text-xl font-bold leading-tight text-cacao">
-            #{order.order_number ?? '—'}
+            {identity.primary}
           </p>
+          {identity.secondary && (
+            <p className="font-sans text-xs font-semibold text-stone-400">
+              {identity.secondary}
+            </p>
+          )}
           <p className="font-sans text-xs font-semibold text-stone-400">
             {orderTypeLabel}
           </p>

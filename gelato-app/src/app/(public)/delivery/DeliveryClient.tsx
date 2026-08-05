@@ -40,7 +40,7 @@ export function DeliveryClient({ products, categories }: Props) {
         {/* Header */}
         <header className="text-center space-y-1">
           <h1 className="font-outfit font-semibold text-2xl md:text-3xl text-amber-950 tracking-tight">
-            Punto Glaceal
+            Punto Glacial
           </h1>
           <p className="text-stone-500 text-xs font-sans">
             Pedí para llevar — agregá al carrito

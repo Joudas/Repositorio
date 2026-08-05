@@ -12,8 +12,9 @@ export type KitchenOrderItem = {
 
 export type KitchenOrder = {
   id: string
+  order_number: number | null // #Ticket (misma secuencia order_number_seq)
   order_type: 'DINE_IN' | 'TAKEAWAY'
-  status: 'PENDING' | 'READY'
+  kitchen_status: 'PENDING' | 'IN_PREPARATION' | 'READY'
   table_number: number | null
   total_amount: number
   observation: string | null

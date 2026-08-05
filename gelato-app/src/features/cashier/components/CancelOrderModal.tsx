@@ -1,8 +1,11 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertTriangle, Loader2, X } from 'lucide-react'
+import { AlertTriangle, Loader2, RotateCcw, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import type { LucideIcon } from 'lucide-react'
+
+type Mode = 'cancel' | 'refund'
 
 type Props = {
   open: boolean
@@ -10,13 +13,37 @@ type Props = {
   onConfirm: (reason: string) => void
   submitting: boolean
   error: string | null
+  // 'cancel' (default) = cancelación al momento de cobrar; 'refund' = devolución desde historial.
+  // El sistema de estados no cambia (payment_status → CANCELED); cambian los textos y el icono.
+  mode?: Mode
 }
 
 const MIN_REASON_LENGTH = 3
 
-export function CancelOrderModal({ open, onClose, onConfirm, submitting, error }: Props) {
+// Configuración por modo (module-level: no se recrea en cada render)
+const MODE_CONFIG: Record<Mode, { title: string; description: string; confirmLabel: string; iconTone: string; Icon: LucideIcon }> = {
+  cancel: {
+    title: 'Cancelar pedido',
+    description:
+      'El pedido se cancelará y dejará de aparecer en Por Cobrar. El motivo es obligatorio.',
+    confirmLabel: 'Confirmar Cancelación',
+    iconTone: 'bg-red-100 text-red-600',
+    Icon: AlertTriangle,
+  },
+  refund: {
+    title: 'Devolver pedido',
+    description:
+      'Se registrará la devolución del pedido y dejará de aparecer como pagado. El motivo es obligatorio.',
+    confirmLabel: 'Confirmar Devolución',
+    iconTone: 'bg-amber-100 text-amber-700',
+    Icon: RotateCcw,
+  },
+}
+
+export function CancelOrderModal({ open, onClose, onConfirm, submitting, error, mode = 'cancel' }: Props) {
   const [reason, setReason] = useState('')
   const valid = reason.trim().length >= MIN_REASON_LENGTH
+  const config = MODE_CONFIG[mode]
 
   // Cerrar con Escape
   useEffect(() => {
@@ -60,11 +87,11 @@ export function CancelOrderModal({ open, onClose, onConfirm, submitting, error }
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-red-100 text-red-600">
-                  <AlertTriangle className="h-5 w-5" aria-hidden />
+                <span className={`flex h-9 w-9 items-center justify-center rounded-full ${config.iconTone}`}>
+                  <config.Icon className="h-5 w-5" aria-hidden />
                 </span>
                 <h2 className="font-outfit text-lg font-semibold text-cacao">
-                  Cancelar pedido
+                  {config.title}
                 </h2>
               </div>
               <button
@@ -78,13 +105,12 @@ export function CancelOrderModal({ open, onClose, onConfirm, submitting, error }
             </div>
 
             <p className="mt-2 font-sans text-sm text-stone-500">
-              El pedido se cancelará y dejará de aparecer en Por Cobrar. El motivo
-              es obligatorio.
+              {config.description}
             </p>
 
             <label className="mt-4 block">
               <span className="font-outfit text-xs font-semibold uppercase tracking-wider text-stone-500">
-                Motivo de la cancelación
+                Motivo
               </span>
               <textarea
                 value={reason}
@@ -124,7 +150,7 @@ export function CancelOrderModal({ open, onClose, onConfirm, submitting, error }
                 {submitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
                 ) : (
-                  'Confirmar Cancelación'
+                  config.confirmLabel
                 )}
               </button>
             </div>

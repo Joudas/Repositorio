@@ -1,20 +1,20 @@
 export type UpdateOrderInput =
-  | { status: 'READY' }
-  | { status: 'PAID'; paymentMethodId: string; paymentReference?: string }
-  | { status: 'CANCELED'; cancelReason: string }
+  | { kitchenStatus: 'READY' }
+  | { paymentStatus: 'PAID'; paymentMethodId: string; paymentReference?: string }
+  | { paymentStatus: 'CANCELED'; cancelReason: string }
 
 export async function updateOrder(id: string, input: UpdateOrderInput): Promise<void> {
   const body =
-    input.status === 'READY'
-      ? { status: 'READY' as const }
-      : input.status === 'PAID'
+    'kitchenStatus' in input
+      ? { kitchen_status: 'READY' as const }
+      : input.paymentStatus === 'PAID'
         ? {
-            status: 'PAID' as const,
+            payment_status: 'PAID' as const,
             payment_method_id: input.paymentMethodId,
             payment_reference: input.paymentReference?.trim() || undefined,
           }
         : {
-            status: 'CANCELED' as const,
+            payment_status: 'CANCELED' as const,
             cancel_reason: input.cancelReason,
           }
 

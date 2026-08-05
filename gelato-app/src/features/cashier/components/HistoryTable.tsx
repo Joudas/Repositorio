@@ -1,12 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { ColumnDef } from '@tanstack/react-table'
+import { RotateCcw } from 'lucide-react'
 import { useSalesHistory } from '@/features/cashier/hooks/useSalesHistory'
+import { useRefundOrder } from '@/features/cashier/hooks/useRefundOrder'
 import { Columns } from '@/features/cashier/components/Columns'
 import DataTable from '@/features/cashier/components/DataTable'
+import { CancelOrderModal } from '@/features/cashier/components/CancelOrderModal'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import type { OrdersFilters } from '@/features/cashier/api/getOrders'
+import type { CashierOrder } from '@/features/cashier/types'
 
 // Fecha local de hoy en formato YYYY-MM-DD (para inputs tipo date)
 function toISODate(date: Date): string {
@@ -32,6 +37,47 @@ export default function HistoryTable() {
   })
 
   const { data: orders, isLoading, isError } = useSalesHistory(appliedFilters)
+
+  // Devolución: la orden seleccionada para devolver (solo filas Pagado)
+  const [refundOrder, setRefundOrder] = useState<CashierOrder | null>(null)
+  const refund = useRefundOrder()
+
+  // Columna de acciones construida acá (Columns es estático y no recibe callbacks).
+  // setRefundOrder es estable → useMemo con deps [] es correcto (rerender-memo).
+  const columns = useMemo<ColumnDef<CashierOrder>[]>(
+    () => [
+      ...Columns,
+      {
+        id: 'actions',
+        header: 'Acciones',
+        cell: ({ row }) => {
+          const order = row.original
+          // Solo se devuelve lo que se cobró (payment_status PAID)
+          if (order.payment_status !== 'PAID') return null
+          return (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRefundOrder(order)}
+              className="h-8 border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+            >
+              <RotateCcw className="h-4 w-4" aria-hidden />
+              Devolver
+            </Button>
+          )
+        },
+      },
+    ],
+    [],
+  )
+
+  function handleRefundConfirm(reason: string) {
+    if (!refundOrder) return
+    refund.mutate(
+      { orderId: refundOrder.id, cancelReason: reason },
+      { onSuccess: () => setRefundOrder(null) },
+    )
+  }
 
   function handleSearch() {
     if (from && to && from > to) {
@@ -117,7 +163,17 @@ export default function HistoryTable() {
           Ocurrió un error al cargar el historial. Inténtalo de nuevo.
         </p>
       ) : (
-        <DataTable columns={Columns} data={orders ?? []} />
+        <>
+          <DataTable columns={columns} data={orders ?? []} />
+          <CancelOrderModal
+            mode="refund"
+            open={refundOrder !== null}
+            onClose={() => setRefundOrder(null)}
+            onConfirm={handleRefundConfirm}
+            submitting={refund.isPending}
+            error={refund.isError ? refund.error.message : null}
+          />
+        </>
       )}
     </div>
   )
